@@ -199,12 +199,8 @@ export default function EdirOrgStructureDialog(
       selectedItem={projectStruction["manager"]?.name}
       placeHolder={t("select_a")}
       errorMessage={error.get("manager")}
-      apiUrl={"project-managers/unique/names"}
+      apiUrl={`project-managers/unique/names/${id}`}
       mode="single"
-      params={{
-        project_id: id,
-        organization_id: user.id,
-      }}
       cacheData={false}
     />
   ) : (
