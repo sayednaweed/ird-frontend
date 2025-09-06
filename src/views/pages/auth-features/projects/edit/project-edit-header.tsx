@@ -16,6 +16,7 @@ export default function ProjectEditHeader(props: ProjectEditHeaderProps) {
         {userData?.name}
       </h1>
       <BooleanStatusButton
+        className="mx-auto"
         getColor={function (): {
           style: string;
           value?: string;

@@ -123,6 +123,7 @@ export const PermissionEnum = {
       user: 51,
       organization: 52,
       donor: 53,
+      project: 54,
     },
   },
   activity: {

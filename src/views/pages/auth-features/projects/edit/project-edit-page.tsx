@@ -141,7 +141,7 @@ export default function ProjectEditPage() {
           {userData.status_id == StatusEnum.document_upload_required && (
             <>
               <NastranModel
-                size="lg"
+                size="md"
                 isDismissable={false}
                 button={
                   <IconButton className="hover:bg-primary/5 gap-x-4 grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] mx-auto transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2">
@@ -171,7 +171,7 @@ export default function ProjectEditPage() {
                   start({
                     id: crypto.randomUUID(),
                     filename: `${userData.name}.zip`,
-                    url: `projects/generate/mou/${id}`,
+                    url: `projects/unsigned/mou/${id}`,
                   })
                 }
                 className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2"

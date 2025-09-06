@@ -125,7 +125,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ user: initUser, authenticated: false, loading: false });
     }
   },
-  loginOrganization: async (email, password, rememberMe) => {
+  loginOrganization: async (email, password, _) => {
     const formData = new FormData();
     formData.append("email", email);
     formData.append("password", password);
@@ -133,19 +133,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const response = await axiosClient.post("auth-organization", formData);
       if (response.status === 200) {
-        const user = response.data.user as Organization;
+        const user = response.data.user;
         user.permissions = returnPermissionsMap(response.data?.permissions);
-
-        if (rememberMe) {
-          setToken({ type: "organization" });
-        }
-
         set({
           user,
           authenticated: true,
           loading: false,
           token: response.data?.access_token,
         });
+        setToken({ type: "organization" });
       }
       return response;
     } catch (error) {
@@ -163,7 +159,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     removeToken();
     set({ user: initUser, authenticated: false, loading: false });
   },
-  loginDonor: async (email, password, rememberMe) => {
+  loginDonor: async (email, password, _) => {
     const formData = new FormData();
     formData.append("email", email);
     formData.append("password", password);
@@ -171,19 +167,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const response = await axiosClient.post("auth-donor", formData);
       if (response.status === 200) {
-        const user = response.data.user as Organization;
+        const user = response.data.user;
         user.permissions = returnPermissionsMap(response.data?.permissions);
-
-        if (rememberMe) {
-          setToken({ type: "donor" });
-        }
-
         set({
           user,
           authenticated: true,
           loading: false,
           token: response.data?.access_token,
         });
+        setToken({ type: "donor" });
       }
       return response;
     } catch (error) {

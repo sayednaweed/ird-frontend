@@ -62,6 +62,10 @@ export default function ApprovalPage() {
           <TabsTrigger key={index} value={key.toString()} className={tabStyle}>
             {t("donor")}
           </TabsTrigger>
+        ) : key == PermissionEnum.approval.sub.project ? (
+          <TabsTrigger key={index} value={key.toString()} className={tabStyle}>
+            {t("project")}
+          </TabsTrigger>
         ) : undefined;
       }),
     []
@@ -136,6 +140,14 @@ export default function ApprovalPage() {
             pendingUrl={"approvals/pending/donors"}
             approvedUrl={"approvals/approved/donors"}
             rejectedUrl={"approvals/approved/donors"}
+          />
+        </TabsContent>
+        <TabsContent value={PermissionEnum.approval.sub.project.toString()}>
+          <ApprovalTab
+            filters={filters}
+            pendingUrl={"approvals/pending/projects"}
+            approvedUrl={"approvals/approved/projects"}
+            rejectedUrl={"approvals/approved/projects"}
           />
         </TabsContent>
       </Tabs>

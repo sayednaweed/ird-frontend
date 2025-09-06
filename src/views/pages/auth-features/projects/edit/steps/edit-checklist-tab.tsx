@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -19,6 +20,7 @@ import { toast } from "sonner";
 import CheckListChooser from "@/components/custom-ui/chooser/CheckListChooser";
 import { TaskTypeEnum } from "@/database/model-enums";
 import { useGeneralAuthState } from "@/stores/auth/use-auth-store";
+import NastranSpinner from "@/components/custom-ui/spinner/NastranSpinner";
 
 export interface EditChecklistTabProps {
   hasEdit: boolean;
@@ -55,74 +57,81 @@ export default function EditChecklistTab(props: EditChecklistTabProps) {
     <Card className="h-fit">
       <CardHeader className="space-y-0">
         <CardTitle className="rtl:text-3xl-rtl ltr:text-2xl-ltr">
-          {t("agreement_information")}
+          {t("checklist")}
         </CardTitle>
+        <CardDescription className="rtl:text-xl-rtl ltr:text-lg-ltr">
+          {t("edit_descr")}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        {documents.map((doc: AgreementDocument, index: number) => (
-          <CheckListChooser
-            donwloadUrl="media/private"
-            hasEdit={hasEdit}
-            number={`${index + 1}`}
-            key={doc.checklist_id}
-            url={`${
-              import.meta.env.VITE_API_BASE_URL
-            }/api/v1/single/checklist/file/upload/no-pending`}
-            headers={{}}
-            accept={doc.acceptable_mimes}
-            name={doc.checklist_name}
-            defaultFile={doc}
-            // validTypes={["image/png", "image/jpeg", "image/gif"]}
-            uploadParam={{
-              document_id: doc.document_id,
-              checklist_id: doc.checklist_id,
-              organization_id: user.id,
-              project_id: id,
-              task_type: TaskTypeEnum.project_registeration,
-            }}
-            onComplete={async (record: any) => {
-              // 1. Update userData
-              for (const element of record) {
-                const item = element[element.length - 1];
-                const { file, message } = item;
-                setDocuments((prev) =>
-                  prev.map((item) => {
-                    return item.checklist_id == file?.checklist_id
-                      ? {
-                          ...item, // preserve all original fields
-                          path: file.path,
-                          document_id: file.document_id,
-                          size: file.size,
-                          type: file.type,
-                          name: file.name,
-                        }
-                      : item;
-                  })
-                );
-                toast.success(message);
-              }
-            }}
-            onFailed={async (failed: boolean, response: any) => {
-              if (failed) {
-                if (response) {
-                  toast.error(response.data.message);
+        {loading ? (
+          <NastranSpinner />
+        ) : (
+          documents.map((doc: AgreementDocument, index: number) => (
+            <CheckListChooser
+              donwloadUrl="media/private"
+              hasEdit={hasEdit}
+              number={`${index + 1}`}
+              key={doc.checklist_id}
+              url={`${
+                import.meta.env.VITE_API_BASE_URL
+              }/api/v1/single/checklist/file/upload/no-pending`}
+              headers={{}}
+              accept={doc.acceptable_mimes}
+              name={doc.checklist_name}
+              defaultFile={doc}
+              // validTypes={["image/png", "image/jpeg", "image/gif"]}
+              uploadParam={{
+                document_id: doc.document_id,
+                checklist_id: doc.checklist_id,
+                organization_id: user.id,
+                project_id: id,
+                task_type: TaskTypeEnum.project_registeration,
+              }}
+              onComplete={async (record: any) => {
+                // 1. Update userData
+                for (const element of record) {
+                  const item = element[element.length - 1];
+                  const { file, message } = item;
+                  setDocuments((prev) =>
+                    prev.map((item) => {
+                      return item.checklist_id == file?.checklist_id
+                        ? {
+                            ...item, // preserve all original fields
+                            path: file.path,
+                            document_id: file.document_id,
+                            size: file.size,
+                            type: file.type,
+                            name: file.name,
+                          }
+                        : item;
+                    })
+                  );
+                  toast.success(message);
                 }
-              }
-            }}
-            onStart={async (_file: File) => {}}
-            validateBeforeUpload={function (file: File): boolean {
-              const maxFileSize = doc.file_size * 1024; // 2MB
-              const validTypes: string[] = doc.acceptable_mimes.split(",");
-              const resultFile = validateFile(
-                file,
-                Math.round(maxFileSize),
-                validTypes,
-                t
-              );
-              return resultFile ? true : false;
-            }}
-          />
-        ))}
+              }}
+              onFailed={async (failed: boolean, response: any) => {
+                if (failed) {
+                  if (response) {
+                    toast.error(response.data.message);
+                  }
+                }
+              }}
+              onStart={async (_file: File) => {}}
+              validateBeforeUpload={function (file: File): boolean {
+                const maxFileSize = doc.file_size * 1024; // 2MB
+                const validTypes: string[] = doc.acceptable_mimes.split(",");
+                const resultFile = validateFile(
+                  file,
+                  Math.round(maxFileSize),
+                  validTypes,
+                  t
+                );
+                return resultFile ? true : false;
+              }}
+            />
+          ))
+        )}
       </CardContent>
 
       {failed && (
