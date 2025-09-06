@@ -147,7 +147,7 @@ export default function ApprovalPage() {
             filters={filters}
             pendingUrl={"approvals/pending/projects"}
             approvedUrl={"approvals/approved/projects"}
-            rejectedUrl={"approvals/approved/projects"}
+            rejectedUrl={"approvals/rejected/projects"}
           />
         </TabsContent>
       </Tabs>
