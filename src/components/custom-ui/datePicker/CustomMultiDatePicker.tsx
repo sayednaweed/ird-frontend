@@ -31,12 +31,12 @@ export default function CustomMultiDatePicker(
   const calendarRef = useRef<any>(null);
 
   useEffect(() => {
-    // Add event listener for clicks outside
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       calendarRef.current &&
@@ -47,13 +47,10 @@ export default function CustomMultiDatePicker(
   };
 
   const handleDateChange = (selectedDates: DateObject[]) => {
-    // let object = { date, format };
-    // const gre = new DateObject(object)
-    // .convert(gregorian, gregorian_en)
-    // .format();
     dateOnComplete(selectedDates);
     setSelectedDates(selectedDates);
   };
+
   const onVisibilityChange = () => setVisible(!visible);
 
   let months: any = [];
@@ -64,13 +61,14 @@ export default function CustomMultiDatePicker(
       months = afgMonthNamesEn;
     }
   }
+
   return (
-    <div dir={direction} className="relative">
+    <div dir={direction} className="relative w-full max-w-sm">
       {visible && (
         <Calendar
           value={selectedDates}
           ref={calendarRef}
-          className="absolute font-segoe top-10"
+          className="absolute z-10 font-segoe top-14"
           onChange={handleDateChange}
           months={months}
           range
@@ -81,41 +79,45 @@ export default function CustomMultiDatePicker(
       )}
 
       <div
-        className={cn(`border px-3 py-1 rounded-md`, className)}
+        className={cn(
+          `bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 
+          rounded px-4 py-2 min-h-[44px] cursor-pointer shadow-sm 
+          hover:shadow-md transition-shadow duration-200 flex items-center flex-wrap gap-2`,
+          className
+        )}
         onClick={onVisibilityChange}
       >
+        <CalendarDays className="w-4 h-4 text-primary/80" />
+
         {selectedDates && selectedDates.length > 0 ? (
-          <div className="flex items-center gap-x-2 text-ellipsis rtl:text-lg-rtl ltr:text-lg-ltr text-primary/80 text-nowrap">
-            <CalendarDays className="size-[16px] inline-block text-tertiary rtl:ml-2 rtl:mr-2" />
-            {selectedDates.map((date: DateObject, index: number) => (
-              <div key={index} className="flex gap-x-2">
-                {index % 2 == 1 && (
-                  <h1 className="text-tertiary font-semibold">
-                    {state.systemLanguage.info.localeId ===
-                      CALENDAR_LOCALE.farsi ||
-                    state.systemLanguage.info.localeId ===
-                      CALENDAR_LOCALE.arabic
-                      ? "به"
-                      : "to"}
-                  </h1>
-                )}
-                <h1>
-                  {date
-                    .convert(
-                      state.systemLanguage.calendar,
-                      state.systemLanguage.local
-                    )
-                    .format()}
-                </h1>
-                {/* <h1>{formatHijriDate(date)}</h1> */}
-              </div>
-            ))}
-          </div>
+          selectedDates.map((date: DateObject, index: number) => (
+            <div
+              key={index}
+              className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-2 py-1 rounded text-sm"
+            >
+              {index % 2 === 1 && (
+                <span className="text-gray-500 dark:text-gray-400 font-medium">
+                  {state.systemLanguage.info.localeId ===
+                    CALENDAR_LOCALE.farsi ||
+                  state.systemLanguage.info.localeId === CALENDAR_LOCALE.arabic
+                    ? "به"
+                    : "to"}
+                </span>
+              )}
+              <span>
+                {date
+                  .convert(
+                    state.systemLanguage.calendar,
+                    state.systemLanguage.local
+                  )
+                  .format()}
+              </span>
+            </div>
+          ))
         ) : (
-          <h1 className="flex items-center gap-x-2 text-ellipsis rtl:text-lg-rtl ltr:text-lg-ltr text-primary/80 text-nowrap">
-            <CalendarDays className="size-[16px] inline-block text-tertiary" />
+          <span className="text-gray-400 dark:text-gray-500 text-sm">
             {t("select_a_date")}
-          </h1>
+          </span>
         )}
       </div>
     </div>

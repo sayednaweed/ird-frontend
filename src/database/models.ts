@@ -436,3 +436,68 @@ export type ProjectDetailType = {
   action_plan_farsi: string;
   action_plan_pashto: string;
 };
+export type Schedules = {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  representators_count: number;
+  presentation_lenght: number;
+  gap_between: number;
+  lunch_start: string;
+  lunch_end: string;
+  dinner_start: string;
+  dinner_end: string;
+  presentation_before_lunch: number;
+  presentation_after_lunch: number;
+  is_hour_24: number;
+  status: string;
+  schedule_status_id: number;
+};
+export interface Project {
+  id: number;
+  name: string;
+  attachment?: FileType;
+  selected: boolean;
+}
+export interface TimeSlot {
+  id: number;
+  presentation_start: string;
+  presentation_end: string;
+  gap_end: string;
+}
+
+export interface FixedBreak {
+  start: string; // e.g., "12:30"
+  end: string; // e.g., "13:30"
+}
+
+export interface ScheduleItem {
+  slot: TimeSlot;
+  attachment?: FileType;
+  projectId: number | null;
+  project_name: string | undefined;
+}
+export type Schedule = {
+  id?: string;
+  date: DateObject;
+  presentation_count: number;
+  projects: Project[];
+  scheduleItems: ScheduleItem[];
+  start_time: string;
+  end_time: string;
+  is_hour_24: boolean;
+  presentation_length: number;
+  gap_between: number;
+  lunch_start: string;
+  lunch_end: string;
+  dinner_start: string;
+  dinner_end: string;
+  presentations_before_lunch: number;
+  presentations_after_lunch: number;
+  validation_checklist: any;
+  special_projects: {
+    project: { id: number; name: string };
+    attachment: FileType;
+  }[];
+};

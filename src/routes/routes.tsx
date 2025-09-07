@@ -27,6 +27,8 @@ import OrganizationProtectedRoute from "@/routes/organization-protected-route";
 import AddProject from "@/views/pages/auth-features/projects/add/add-project";
 import ProjectEditPage from "@/views/pages/auth-features/projects/edit/project-edit-page";
 import ProjectsPage from "@/views/pages/auth-features/projects/projects-page";
+import SchedulesPage from "@/views/pages/auth-features/schedules/schedules-page";
+import AddOrEditSchedule from "@/views/pages/auth-features/schedules/add-or-edit-schedule";
 const SuperDashboardPage = lazy(
   () =>
     import("@/views/pages/auth-features/dashboard/super/super-dashboard-page")
@@ -299,6 +301,28 @@ export const getAuthRouter = (
             <ProtectedRoute
               element={<ProjectEditPage />}
               routeName="projects"
+              permissions={permissions}
+              authenticated={authenticated}
+            />
+          }
+        />
+        <Route
+          path="schedules"
+          element={
+            <ProtectedRoute
+              element={<SchedulesPage />}
+              routeName="schedules"
+              permissions={permissions}
+              authenticated={authenticated}
+            />
+          }
+        />
+        <Route
+          path="schedules/:data/*"
+          element={
+            <ProtectedRoute
+              element={<AddOrEditSchedule />}
+              routeName="schedules"
               permissions={permissions}
               authenticated={authenticated}
             />

@@ -139,7 +139,7 @@ export default function CustomDatePicker(props: CustomeDatePickerProps) {
       {/* Input / trigger div */}
       <div
         className={cn(
-          `border relative px-3 py-1 rounded-md ${
+          `border relative px-3 py-1 rounded ${
             readonly ? "cursor-not-allowed" : "cursor-pointer"
           } ${required || lable ? "mt-[20px]" : "mt-2"} ${
             errorMessage ? "border-red-400" : "border-gray-300"
@@ -161,12 +161,12 @@ export default function CustomDatePicker(props: CustomeDatePickerProps) {
 
         {selectedDates ? (
           <h1 className="flex items-center gap-x-2 text-ellipsis rtl:text-lg-rtl ltr:text-lg-ltr text-primary/80 whitespace-nowrap overflow-hidden">
-            <CalendarDays className="size-[16px] inline-block text-tertiary rtl:ml-2 rtl:mr-2" />
+            <CalendarDays className="size-[16px] w-4 h-4 text-primary/80 inline-block rtl:ml-2 rtl:mr-2" />
             {formatHijriDate(selectedDates)}
           </h1>
         ) : (
           <h1 className="flex items-center gap-x-2 text-ellipsis rtl:text-lg-rtl ltr:text-lg-ltr font-semibold text-primary whitespace-nowrap overflow-hidden">
-            <CalendarDays className="size-[16px] inline-block text-tertiary" />
+            <CalendarDays className="size-[16px] w-4 h-4 text-primary/80 inline-block" />
             {placeholder}
           </h1>
         )}

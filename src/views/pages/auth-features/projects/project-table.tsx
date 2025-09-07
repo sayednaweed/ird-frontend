@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router";
 import axiosClient from "@/lib/axois-client";
@@ -44,12 +44,12 @@ import { useDatasource } from "@/hook/use-datasource";
 import { toast } from "sonner";
 import { PermissionEnum, RoleEnum, StatusEnum } from "@/database/model-enums";
 import Shimmer from "@/components/custom-ui/shimmer/shimmer";
+import { useDebounce } from "@/hook/use-debounce";
 
 export function ProjectTable() {
   const { user } = useGeneralAuthState();
   const navigate = useNavigate();
   const [state] = useGlobalState();
-  const searchRef = useRef<HTMLInputElement>(null);
   const { updateComponentCache, getComponentCache } = useCacheDB();
 
   const [searchParams] = useSearchParams();
@@ -61,7 +61,8 @@ export function ProjectTable() {
   const startDate = searchParams.get("st_dt");
   const endDate = searchParams.get("en_dt");
   const page = searchParams.get("page");
-
+  const [inputValue, setInputValue] = useState(searchValue);
+  const debouncedValue = useDebounce(inputValue, 500);
   const filters = {
     sort: sort == null ? "registration_no" : (sort as ProjectSort),
     page: page == null ? "1" : page,
@@ -163,7 +164,20 @@ export function ProjectTable() {
       },
     }
   );
-
+  useEffect(() => {
+    if (debouncedValue) {
+      const queryParams = new URLSearchParams();
+      queryParams.set("sort", filters.sort);
+      queryParams.set("order", filters.order);
+      queryParams.set("page", filters.page);
+      queryParams.set("sch_col", filters.search.column);
+      queryParams.set("sch_val", debouncedValue);
+      setDateToURL(queryParams, filters.date);
+      navigate(`/dashboard/projects?${queryParams.toString()}`, {
+        replace: true,
+      });
+    }
+  }, [debouncedValue]);
   const { t } = useTranslation();
 
   const deleteOnClick = async (project: Projects) => {
@@ -188,22 +202,7 @@ export function ProjectTable() {
       toast.error(error.response.data.message);
     }
   };
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault(); // prevent form submission or default behavior
-      const queryParams = new URLSearchParams();
-      queryParams.set("sort", filters.sort);
-      queryParams.set("order", filters.order);
-      queryParams.set("page", filters.page);
-      queryParams.set("sch_col", filters.search.column);
-      if (searchRef.current)
-        queryParams.set("sch_val", searchRef.current?.value);
-      setDateToURL(queryParams, filters.date);
-      navigate(`/dashboard/projects?${queryParams.toString()}`, {
-        replace: true,
-      });
-    }
-  };
+
   const skeleton = (
     <TableRow>
       <TableCell>
@@ -259,32 +258,13 @@ export function ProjectTable() {
           placeholder={`${t(filters.search.column)}...`}
           parentClassName="sm:flex-1 col-span-3"
           type="text"
-          defaultValue={filters.search.value}
-          ref={searchRef}
-          onKeyDown={handleKeyDown}
           startContent={
             <Search className="size-[18px] mx-auto rtl:mr-[4px] text-primary pointer-events-none" />
           }
-          endContent={
-            <SecondaryButton
-              onClick={async () => {
-                const queryParams = new URLSearchParams();
-                queryParams.set("sort", filters.sort);
-                queryParams.set("order", filters.order);
-                queryParams.set("page", filters.page);
-                queryParams.set("sch_col", filters.search.column);
-                if (searchRef.current)
-                  queryParams.set("sch_val", searchRef.current?.value);
-                setDateToURL(queryParams, filters.date);
-                navigate(`/dashboard/projects?${queryParams.toString()}`, {
-                  replace: true,
-                });
-              }}
-              className="w-[72px] absolute rtl:left-[6px] ltr:right-[6px] -top-[7px] h-[32px] rtl:text-sm-rtl ltr:text-md-ltr hover:shadow-sm shadow-lg"
-            >
-              {t("search")}
-            </SecondaryButton>
-          }
+          onChange={(e) => {
+            const { value } = e.target;
+            setInputValue(value);
+          }}
         />
         <div className="sm:px-4 col-span-3 flex-1 self-start gap-x-3 sm:self-baseline flex justify-end items-center">
           <NastranModel

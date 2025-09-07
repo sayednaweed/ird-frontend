@@ -157,6 +157,15 @@ export default function ViewApprovalDailog(props: ViewApprovalDailogprops) {
                 />
               </>
             )}
+            {approval?.request_comment && (
+              <CustomTextarea
+                label={t("responder_comment")}
+                rows={4}
+                disabled={true}
+                maxLength={300}
+                defaultValue={approval?.request_comment}
+              />
+            )}
             <CustomTextarea
               label={t("responder_comment")}
               rows={4}

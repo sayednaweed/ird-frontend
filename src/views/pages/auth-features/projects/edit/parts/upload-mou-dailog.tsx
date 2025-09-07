@@ -108,7 +108,7 @@ export default function UploadMouDailog(props: UploadMouDailogProps) {
     <Card className="w-full my-8 self-center [backdrop-filter:blur(20px)] bg-card">
       <CardHeader className="relative text-start">
         <CardTitle className="rtl:text-4xl-rtl ltr:text-3xl-ltr text-tertiary">
-          {t("up_register_fo")}
+          {t("upload_sign_doc")}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-y-4">
