@@ -282,9 +282,17 @@ const EditScheduleTab = (props: EditScheduleTabProps) => {
         }
       }
       // 2. Send data
+      const fixedDateUTC = new Date(
+        Date.UTC(
+          schedule.date.year,
+          schedule.date.month.index,
+          schedule.date.day
+        )
+      );
+
       const data = {
         id: schedule?.id,
-        date: schedule.date.toDate().toISOString(),
+        date: fixedDateUTC.toISOString(),
         start_time: schedule.start_time,
         end_time: schedule.end_time,
         dinner_end: schedule.dinner_end,

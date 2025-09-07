@@ -52,6 +52,9 @@ export const TaskTypeEnum = {
 };
 export const NotifierEnum = {
   confirm_adding_user: 1,
+  confirm_signed_registration_form: 2,
+  confirm_signed_project_form: 3,
+  signed_register_form_accepted: 4,
 };
 export const ApprovalTypeEnum = {
   approved: 1,

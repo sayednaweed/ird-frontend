@@ -129,6 +129,7 @@ export default function ViewApprovalDailog(props: ViewApprovalDailogprops) {
               title={t("requester")}
               selected={approval?.requester_name}
             />
+
             <FakeCombobox
               icon={
                 <CalendarDays className="size-[16px] text-tertiary absolute top-1/2 transform -translate-y-1/2 ltr:right-4 rtl:left-4" />

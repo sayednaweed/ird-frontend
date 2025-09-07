@@ -30,7 +30,6 @@ export default function AddOrEditSchedule() {
   const direction = i18n.dir();
   const { data, "*": restPath } = useParams();
   const fullDate = restPath ? `${data}/${restPath}` : data;
-
   const navigate = useNavigate();
   const handleGoHome = () => navigate("/dashboard", { replace: true });
   const handleGoBack = () =>

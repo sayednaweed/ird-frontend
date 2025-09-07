@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import type { ValidateItem } from "@/validation/types";
 import { useModelOnRequestHide } from "@/components/custom-ui/model/hook/useModelOnRequestHide";
 import { Button } from "@/components/ui/button";
-import { useGeneralAuthState } from "@/stores/auth/use-auth-store";
 
 export interface EdirOrgStructureDialogProps {
   onComplete: (projectManager: ProjectManager) => void;
@@ -37,7 +36,6 @@ export default function EdirOrgStructureDialog(
   const { modelOnRequestHide } = useModelOnRequestHide();
   const { t } = useTranslation();
   let { id } = useParams();
-  const { user } = useGeneralAuthState();
   const [storing, setStoring] = useState(false);
   const [projectStruction, setProjectStruction] = useState<
     ProjectOrganizationStructureType | any

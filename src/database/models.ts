@@ -172,6 +172,8 @@ export interface IApproval {
   notifier_type: string;
   approval_documents: ApprovalDocument[];
   completed: boolean;
+  // project
+  approved_date: string;
 }
 export interface Applications {
   id: number;

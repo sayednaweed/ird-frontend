@@ -33,7 +33,7 @@ export interface EdirProjectDirectorDialogProps {
 export default function EdirProjectDirectorDialog(
   props: EdirProjectDirectorDialogProps
 ) {
-  const { hasEdit, onComplete } = props;
+  const { hasEdit } = props;
   const { t } = useTranslation();
   let { id } = useParams();
   const [loading, setLoading] = useState(true);
