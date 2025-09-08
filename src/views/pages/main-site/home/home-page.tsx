@@ -62,12 +62,12 @@ export default function HomePage() {
           }}
           tabLList={[
             {
-              name: "All News",
-              url: "all-news",
+              name: "News",
+              url: "news",
             },
             {
-              name: "Latest News",
-              url: "latest-news",
+              name: "Featured News",
+              url: "featured-news",
             },
           ]}
           shimmer={
@@ -132,7 +132,10 @@ export default function HomePage() {
               name: "Organizations",
               url: "organizations",
             },
-           
+            {
+              name: "Featured Organizations",
+              url: "featured-organizations",
+            },
           ]}
           shimmer={
             <>
@@ -196,6 +199,10 @@ export default function HomePage() {
               name: "Donors",
               url: "donors",
             },
+            {
+              name: "Featured Donors",
+              url: "featured-donors",
+            },
           ]}
           shimmer={
             <>
@@ -256,12 +263,12 @@ export default function HomePage() {
           }}
           tabLList={[
             {
-              name: "All Projects",
+              name: "Projects",
               url: "projects",
             },
             {
-              name: "Latest Projects",
-              url: "projects",
+              name: "Featured Projects",
+              url: "featured-projects",
             },
           ]}
           shimmer={
