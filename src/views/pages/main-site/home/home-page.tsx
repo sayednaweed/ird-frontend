@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth/auth-store";
 
-// Matches backend response shape from NewsController::publicNewses
 interface NewsListItem {
   id: number;
   visible: number | boolean;
@@ -27,7 +26,6 @@ interface NewsListItem {
   created_at: string;
 }
 
-// Matches backend response from ViewsOrganizationController::publicOrganizations
 interface OrganizationListItem {
   id: number;
   abbr: string | null;
@@ -37,7 +35,6 @@ interface OrganizationListItem {
   director: string;
 }
 
-// Matches DonorController::index paginator shape (key: donor)
 interface DonorListItem {
   id: number;
   profile: string | null;
@@ -49,7 +46,6 @@ interface DonorListItem {
   created_at: string;
 }
 
-// Matches ViewProjectController::index paginator shape (key: projects)
 interface ProjectListItem {
   id: number;
   budget: number;
@@ -99,7 +95,6 @@ export default function HomePage() {
       const params = isOrg || isDonor || isProject ? { per_page: 12, page: 1 } : { _limit: 12, _page: 1 };
       const response = await axiosClient.get(endpoint, {
         params,
-        // Don't send cookies/credentials to public endpoint to avoid strict CORS blocking
         withCredentials: isOrg || isProject ? false : axiosClient.defaults.withCredentials,
         headers: {
           ...(token && !isOrg && !isProject ? { Authorization: `Bearer ${token}` } : {}),
@@ -143,7 +138,6 @@ export default function HomePage() {
         await fetch("organizations");
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   const loader = (
@@ -199,18 +193,8 @@ export default function HomePage() {
             >
               <CardContent className="p-0 h-[300px] sm:h-[300px]">
                 <CachedImage
-                  src={
-                    data.image
-                      ? data.image.startsWith("images/")
-                        ? `${import.meta.env.VITE_API_BASE_URL}/${data.image}`
-                        : data.image
-                      : undefined
-                  }
-                  routeIdentifier={
-                    data.image && !data.image.startsWith("images/")
-                      ? "public"
-                      : undefined
-                  }
+                  src={data.image ?? undefined}
+                  routeIdentifier="public"
                   shimmerClassName="min-w-full h-full object-fill rounded-t-md"
                   className="min-w-full shadow-lg h-full object-fill rounded-t-md"
                 />

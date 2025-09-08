@@ -58,6 +58,20 @@ const CachedImage = React.forwardRef<HTMLImageElement, ImageProps>(
     const [failed, setFailed] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const start = useDownloadStore((s) => s.startDownload);
+    const normalizePublicPath = (p: string): string => {
+      try {
+        if (!p) return p;
+        // remove any leading slashes
+        let q = p.replace(/^\/+/, "");
+        // If path is like 'news<uuid>.jpg', fix to 'news/<uuid>.jpg'
+        if (!q.includes("/") && q.startsWith("news") && !q.startsWith("news/")) {
+          q = `news/${q.slice(4)}`;
+        }
+        return q;
+      } catch {
+        return p;
+      }
+    };
     const download = async () => {
       try {
         if (src == null || src == undefined) {
@@ -81,9 +95,14 @@ const CachedImage = React.forwardRef<HTMLImageElement, ImageProps>(
           const response = routeIdentifier
             ? await axiosClient.get(`media/${routeIdentifier}`, {
                 params: {
-                  path: src,
+                  path:
+                    routeIdentifier === "public" && typeof src === "string"
+                      ? normalizePublicPath(src)
+                      : src,
                 },
                 responseType: "blob", // Important
+                // For public media, do not send cookies to avoid strict CORS
+                withCredentials: routeIdentifier === "public" ? false : axiosClient.defaults.withCredentials,
               })
             : await axios.get(src, {
                 responseType: "blob",
@@ -153,7 +172,7 @@ const CachedImage = React.forwardRef<HTMLImageElement, ImageProps>(
             filename: src
               ? src.substring(src.lastIndexOf("/") + 1)
               : "profile.jpeg",
-            url: `media/profile?path=${src}`,
+            url: `media/${routeIdentifier ?? "profile"}?path=${src}`,
           })
         }
         ref={ref}
