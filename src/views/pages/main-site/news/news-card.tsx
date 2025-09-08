@@ -75,7 +75,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
             to={`/news/${news.id}`}
             className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
           >
-            Learn more →
+            Read more
           </Link>
         </div>
       </div>

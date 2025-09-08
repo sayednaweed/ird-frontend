@@ -316,7 +316,7 @@ export default function HomePage() {
         <HomeSection<ProjectListItem>
           title={t("Projects")}
           subTitle={t("view_all")}
-          subTitleLink={""}
+          subTitleLink={"/projects"}
           className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
           style={{
             tabContent: {
