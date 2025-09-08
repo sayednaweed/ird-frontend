@@ -264,7 +264,7 @@ export default function OrganizationEditPage() {
                     onClick={() =>
                       start({
                         id: generateUUID(),
-                        filename: `${user.username}.zip`,
+                        filename: `${userData.organizationInformation.name}.zip`,
                         url: `organization/generate/registeration/${id}`,
                       })
                     }
