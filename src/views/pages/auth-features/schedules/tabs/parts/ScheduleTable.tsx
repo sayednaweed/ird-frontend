@@ -1,6 +1,7 @@
 import type { Project, ScheduleItem } from "@/database/models";
 import type { FileType } from "@/lib/types";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   scheduleItems: ScheduleItem[];
@@ -24,7 +25,7 @@ const ScheduleTable: React.FC<Props> = ({
 }) => {
   const getPersonById = (id: number | null) =>
     projects.find((p) => p.id === id) ?? null;
-
+  const { t } = useTranslation();
   return (
     <div className="p-6 max-w-3xl space-y-6 mx-auto">
       {scheduleItems.map((item) => {
@@ -64,7 +65,7 @@ const ScheduleTable: React.FC<Props> = ({
                     );
                   }}
                 >
-                  <option value="">Unassigned</option>
+                  <option value="">{t("unassigned")}</option>
                   {projects.map(
                     (p) =>
                       !p?.selected && (
@@ -77,7 +78,7 @@ const ScheduleTable: React.FC<Props> = ({
               )}
               {project && (
                 <button
-                  className="btn btn-sm btn-outline"
+                  className="btn ltr:ml-4 rtl:mr-4 cursor-pointer btn-sm btn-outline"
                   onClick={() => {
                     const selectedProject = getPersonById(
                       Number(item.projectId)
@@ -92,7 +93,7 @@ const ScheduleTable: React.FC<Props> = ({
                     );
                   }}
                 >
-                  Remove
+                  {t("remove")}
                 </button>
               )}
             </div>

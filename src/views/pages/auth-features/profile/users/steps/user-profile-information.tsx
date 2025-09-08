@@ -1,11 +1,5 @@
 import CustomInput from "@/components/custom-ui/input/CustomInput";
-import {
-  CalendarDays,
-  ChevronsUpDown,
-  Mail,
-  Phone,
-  UserRound,
-} from "lucide-react";
+import { CalendarDays, ChevronsUpDown, Mail, UserRound } from "lucide-react";
 import { useState } from "react";
 import PrimaryButton from "@/components/custom-ui/button/PrimaryButton";
 import {
@@ -26,6 +20,8 @@ import FakeCombobox from "@/components/custom-ui/combobox/FakeCombobox";
 import { useUserAuthState } from "@/stores/auth/use-auth-store";
 import type { Role } from "@/database/models";
 import { toast } from "sonner";
+import CustomPhoneInput from "@/components/custom-ui/input/custom-phone-input";
+import type { ValidateItem } from "@/validation/types";
 
 interface ProfileInformation {
   id: string;
@@ -67,17 +63,15 @@ export default function UserProfileInformation() {
     if (loading) return;
     setLoading(true);
     // 1. Validation
-    if (
-      !(await validate(
-        [
-          { name: "username", rules: ["required", "max:45", "min:3"] },
-          { name: "full_name", rules: ["required", "max:45", "min:3"] },
-          { name: "email", rules: ["required", "max:45", "min:3"] },
-        ],
-        userData,
-        setError
-      ))
-    ) {
+    const validationItems: ValidateItem[] = [
+      { name: "username", rules: ["required", "max:45", "min:3"] },
+      { name: "full_name", rules: ["required", "max:45", "min:3"] },
+      { name: "email", rules: ["required", "max:45", "min:3"] },
+    ];
+    if (userData.contact && userData.contact.length > 5) {
+      validationItems.push({ name: "contact", rules: ["required", "phone"] });
+    }
+    if (!(await validate(validationItems, userData, setError))) {
       setLoading(false);
       return;
     }
@@ -162,20 +156,13 @@ export default function UserProfileInformation() {
             <Mail className="text-secondary-foreground size-[18px] pointer-events-none" />
           }
         />
-        <CustomInput
-          size_="sm"
-          className={`rtl:text-right`}
-          placeholder={t("enter_ur_pho_num")}
-          defaultValue={userData.contact ? userData.contact : ""}
+
+        <CustomPhoneInput
           label={t("contact")}
-          type="text"
-          name="contact"
-          dir="ltr"
-          errorMessage={error.get("contact")}
           onChange={handleChange}
-          startContent={
-            <Phone className="text-primary-icon size-[18px] pointer-events-none" />
-          }
+          value={userData.contact}
+          name="contact"
+          errorMessage={error.get("contact")}
         />
         <FakeCombobox
           icon={

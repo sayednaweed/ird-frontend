@@ -29,6 +29,7 @@ import ProjectEditPage from "@/views/pages/auth-features/projects/edit/project-e
 import ProjectsPage from "@/views/pages/auth-features/projects/projects-page";
 import SchedulesPage from "@/views/pages/auth-features/schedules/schedules-page";
 import AddOrEditSchedule from "@/views/pages/auth-features/schedules/add-or-edit-schedule";
+import { ScheduleView } from "@/views/pages/auth-features/schedules/tabs/parts/start-presentation";
 const SuperDashboardPage = lazy(
   () =>
     import("@/views/pages/auth-features/dashboard/super/super-dashboard-page")
@@ -311,6 +312,17 @@ export const getAuthRouter = (
           element={
             <ProtectedRoute
               element={<SchedulesPage />}
+              routeName="schedules"
+              permissions={permissions}
+              authenticated={authenticated}
+            />
+          }
+        />
+        <Route
+          path="schedules/start/presentation/:id"
+          element={
+            <ProtectedRoute
+              element={<ScheduleView />}
               routeName="schedules"
               permissions={permissions}
               authenticated={authenticated}

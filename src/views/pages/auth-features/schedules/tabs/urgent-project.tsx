@@ -28,7 +28,7 @@ export interface CustomProjectSelectProps {
 }
 
 export function UrgentProject(props: CustomProjectSelectProps) {
-  const { schedule, setSchedule } = props;
+  const { schedule, setSchedule, add } = props;
   const { t } = useTranslation();
   const [error, setError] = useState<Map<string, string>>(new Map());
 
@@ -176,7 +176,7 @@ export function UrgentProject(props: CustomProjectSelectProps) {
           />
           <div className="mt-2">
             <CheckListChooser
-              donwloadUrl={`media/temporary`}
+              donwloadUrl={add ? "media/temporary" : "media/private"}
               key={userData?.document}
               number={undefined}
               hasEdit={true}

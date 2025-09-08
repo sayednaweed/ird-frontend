@@ -506,13 +506,15 @@ const EditScheduleTab = (props: EditScheduleTabProps) => {
         </label>
       </div>
 
-      <PrimaryButton
-        disabled={loading}
-        onClick={prepareSchedule}
-        className={`mx-auto items-center border shadow-none hover:shadow-none`}
-      >
-        <ButtonSpinner loading={loading}>{t("build_schedule")}</ButtonSpinner>
-      </PrimaryButton>
+      {!schedule.passed && (
+        <PrimaryButton
+          disabled={loading}
+          onClick={prepareSchedule}
+          className={`mx-auto items-center border shadow-none hover:shadow-none`}
+        >
+          <ButtonSpinner loading={loading}>{t("build_schedule")}</ButtonSpinner>
+        </PrimaryButton>
+      )}
       <Separator className="mt-6" />
 
       <ScheduleTable
@@ -521,7 +523,7 @@ const EditScheduleTab = (props: EditScheduleTabProps) => {
         formatTime={formatTime}
         onAssign={assignPersonToSlot}
       />
-      {schedule.scheduleItems.length > 0 && (
+      {schedule.scheduleItems.length > 0 && !schedule.passed && (
         <PrimaryButton onClick={store} className={`shadow-lg mx-auto mt-16`}>
           <ButtonSpinner loading={storing}>
             {t(add ? "save" : "update")}

@@ -10,7 +10,6 @@ import { useGlobalState } from "@/context/GlobalStateContext";
 import axiosClient from "@/lib/axois-client";
 import PrimaryButton from "@/components/custom-ui/button/PrimaryButton";
 import { PlaneTakeoff, SquareX } from "lucide-react";
-import NastranModel from "@/components/custom-ui/model/NastranModel";
 import { useDatasource } from "@/hook/use-datasource";
 import type { Schedule } from "@/database/models";
 import {
@@ -19,7 +18,6 @@ import {
   BreadcrumbItem,
   BreadcrumbSeparator,
 } from "@/components/custom-ui/breadcrumb/Breadcrumb";
-import TakePresentation from "@/views/pages/auth-features/schedules/tabs/parts/take-presentation";
 import { NormalProject } from "@/views/pages/auth-features/schedules/tabs/normal-project";
 import { UrgentProject } from "@/views/pages/auth-features/schedules/tabs/urgent-project";
 
@@ -63,10 +61,20 @@ export default function AddOrEditSchedule() {
         dinner_end: "",
         presentations_before_lunch: 0,
         presentations_after_lunch: 0,
+        passed: false,
       };
     } else {
       const response = await axiosClient.get(`schedules/${data}`);
       const sch = response.data;
+      const scheduleDate = new Date(response.data.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      // Also zero out scheduleDate time to compare just the date part
+      scheduleDate.setHours(0, 0, 0, 0);
+
+      if (scheduleDate < today) {
+        sch.passed = true;
+      }
       sch.date = new DateObject(new Date(response.data.date));
       return sch;
     }
@@ -102,30 +110,28 @@ export default function AddOrEditSchedule() {
             {t("schedule")}
           </CardTitle>
           <div className="flex gap-x-4">
-            <NastranModel
-              className="bg-card"
-              size="full"
-              isDismissable={false}
-              button={
+            {!paramData.isValid && !schedule.passed && (
+              <>
                 <PrimaryButton
-                  onClick={cancel}
+                  onClick={() =>
+                    navigate(
+                      `/dashboard/schedules/start/presentation/${schedule?.id}`
+                    )
+                  }
                   className="items-center border bg-primary/5 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-primary/10"
                 >
                   {t("start_resentation")}
                   <PlaneTakeoff />
                 </PrimaryButton>
-              }
-              showDialog={async () => true}
-            >
-              <TakePresentation scheduleItems={schedule.scheduleItems} />
-            </NastranModel>
-            <PrimaryButton
-              onClick={cancel}
-              className="items-center border bg-red-400/20 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-red-400/70"
-            >
-              {t("cancel")}
-              <SquareX />
-            </PrimaryButton>
+                <PrimaryButton
+                  onClick={cancel}
+                  className="items-center border bg-red-400/20 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-red-400/70"
+                >
+                  {t("cancel")}
+                  <SquareX />
+                </PrimaryButton>
+              </>
+            )}
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-y-4 p-0 pb-4 text-start">

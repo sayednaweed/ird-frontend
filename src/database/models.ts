@@ -502,4 +502,30 @@ export type Schedule = {
     project: { id: number; name: string };
     attachment: FileType;
   }[];
+  passed: boolean;
 };
+export interface Presentation {
+  date: string;
+  start_time: string;
+  end_time: string;
+  gap_between: string;
+  lunch_start: string;
+  lunch_end: string;
+  schedule_status: string;
+  schedule_status_id: number;
+  schedule_items: {
+    start_time: string;
+    end_time: string;
+    project_id: number;
+    project_name: string;
+    status_id: number;
+    status: string;
+    documents: {
+      name: string;
+      size: string;
+      path: string;
+      type: string;
+      checklist: string;
+    }[];
+  }[];
+}

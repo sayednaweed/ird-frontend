@@ -22,11 +22,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/custom-ui/breadcrumb/Breadcrumb";
 import OrganizationInformationTab from "@/views/pages/auth-features/organization/form-submit/steps/organization-information-tab";
-import { useGeneralAuthState } from "@/stores/auth/use-auth-store";
+import { useOrganizationAuthState } from "@/stores/auth/use-auth-store";
 import type { Organization } from "@/database/models";
 
 export default function OrganizationFormSubmit() {
-  const { user, setUser } = useGeneralAuthState();
+  const { user, setUser } = useOrganizationAuthState();
   const { t } = useTranslation();
   let { id } = useParams();
   const navigate = useNavigate();
@@ -140,6 +140,9 @@ export default function OrganizationFormSubmit() {
   const handleGoBack = () => navigate("/dashboard/profile");
   const handleGoHome = () => navigate("/dashboard", { replace: true });
   const onClose = () => {
+    navigate(`/dashboard/profile`, { replace: true });
+  };
+  const onComplete = () => {
     navigate(`/dashboard/organizations/${user.id}`, { replace: true });
   };
   return (
@@ -346,7 +349,7 @@ export default function OrganizationFormSubmit() {
                   <CompleteStep
                     successText={t("congratulation")}
                     closeText={t("close")}
-                    closeModel={onClose}
+                    closeModel={onComplete}
                     description={t("info_stored")}
                   />
                 ),

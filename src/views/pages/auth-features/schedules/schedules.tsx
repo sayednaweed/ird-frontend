@@ -3,7 +3,7 @@ import NastranSpinner from "@/components/custom-ui/spinner/NastranSpinner";
 import type { Schedules } from "@/database/models";
 import { useDatasource } from "@/hook/use-datasource";
 import axiosClient from "@/lib/axois-client";
-import { generateUUID, isSameDatePure, isStartDateSmaller } from "@/lib/utils";
+import { generateUUID, isSameDatePure } from "@/lib/utils";
 import { CalendarMinus, CalendarPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -107,17 +107,12 @@ export default function Schedules() {
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-6">
           {schedules.map((item) => {
-            const inputDate = new Date(item.date);
-            const currentDate = new Date();
-            const notAllowed = isStartDateSmaller(inputDate, currentDate);
-
             return (
               <div
                 key={item.id}
                 className={`
               group border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 bg-white dark:bg-gray-900 
-              hover:shadow-lg hover:-translate-y-1 transition-all duration-300
-              ${notAllowed ? "cursor-not-allowed opacity-70" : "cursor-pointer"}
+              hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer
             `}
               >
                 {/* Header: Date and Weekday */}
@@ -141,10 +136,9 @@ export default function Schedules() {
                   </div>
                 ) : (
                   <div
-                    onClick={() => {
-                      if (!notAllowed)
-                        navigate(`/dashboard/schedules/${item.date}`);
-                    }}
+                    onClick={() =>
+                      navigate(`/dashboard/schedules/${item.date}`)
+                    }
                     className="text-center space-y-2"
                   >
                     <CalendarPlus className="w-5 h-5 text-primary mx-auto" />
