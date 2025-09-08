@@ -74,7 +74,10 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     setTab(tab);
   };
 
-  const tabContentStyle = cn("grid grid-cols-4", style?.tabContent?.className);
+  const tabContentStyle = cn(
+    "grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]",
+    style?.tabContent?.className
+  );
   const tabs = tabLList.map((item) => (
     <TabsTrigger
       onClick={() => onTabClick(item.name, item.url)}
