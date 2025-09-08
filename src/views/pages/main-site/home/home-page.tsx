@@ -43,7 +43,7 @@ export default function HomePage() {
       <HomeHeader />
       <section>
         <HomeSection<Book>
-          title={t("health_books")}
+          title={t("News")}
           subTitle={t("view_all")}
           subTitleLink={""}
           className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
@@ -62,12 +62,12 @@ export default function HomePage() {
           }}
           tabLList={[
             {
-              name: "books",
-              url: "health-books",
+              name: "All News",
+              url: "all-news",
             },
             {
-              name: "audio_books",
-              url: "health-books",
+              name: "Latest News",
+              url: "latest-news",
             },
           ]}
           shimmer={
@@ -110,7 +110,7 @@ export default function HomePage() {
       </section>
       <section>
         <HomeSection<Book>
-          title={t("sports_books")}
+          title={t("Organizations")}
           subTitle={t("view_all")}
           subTitleLink={""}
           className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
@@ -129,12 +129,72 @@ export default function HomePage() {
           }}
           tabLList={[
             {
-              name: "books",
-              url: "sports-books",
+              name: "Organizations",
+              url: "organizations",
             },
+           
+          ]}
+          shimmer={
+            <>
+              {loader}
+              {loader}
+              {loader}
+            </>
+          }
+        >
+          {(data) => (
+            <Card
+              key={data.id}
+              className="m-0 p-0 rounded-md shadow relative min-h-[500px] max-h-[500px] gap-y-3 hover:-translate-y-1 transition-transform min-w-[300px] md:w-[320px] duration-300 ease-out"
+            >
+              <CardContent className="p-0 h-[300px] sm:h-[300px]">
+                <CachedImage
+                  src={data.image}
+                  shimmerClassName="min-w-full h-full object-fill rounded-t-md"
+                  className="min-w-full shadow-lg h-full object-fill rounded-t-md"
+                />
+              </CardContent>
+              <CardFooter className="flex flex-col justify-start items-start gap-y-2 pb-6">
+                <h2 className="font-bold rtl:text-lg-rtl max-w-full ltr:text-2xl-ltr line-clamp-2">
+                  {data.title}
+                </h2>
+                <h1 className="rtl:text-lg-rtl ltr:text-xl-ltr max-w-full text-primary/95 line-clamp-3 px-2">
+                  {data.description}
+                </h1>
+                <div className="flex items-center select-none absolute bottom-4 ltr:pt-2 gap-x-2 hover:ltr:translate-x-3 hover:rtl:-translate-x-3 transition-transform ease-in-out cursor-pointer">
+                  <h1 className="rtl:text-2xl-rtl max-w-full ltr:text-xl-ltr">
+                    {t("view")}
+                  </h1>
+                  <ChevronsRight className="text-green-500 cursor-pointer rtl:rotate-180 hover:text-green-500/70 size-[18px] transition" />
+                </div>
+              </CardFooter>
+            </Card>
+          )}
+        </HomeSection>
+      </section>
+      <section>
+        <HomeSection<Book>
+          title={t("Donors")}
+          subTitle={t("view_all")}
+          subTitleLink={""}
+          className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
+          style={{
+            tabContent: {
+              className: "flex gap-x-12 overflow-x-auto gap-y-16 py-4",
+            },
+          }}
+          fetch={async (tab: string, url: string) => {
+            const result = await fetch(url);
+            return {
+              tab: tab,
+              data: result.data,
+              failed: result.failed,
+            };
+          }}
+          tabLList={[
             {
-              name: "audio_books",
-              url: "sports-books",
+              name: "Donors",
+              url: "donors",
             },
           ]}
           shimmer={
@@ -177,7 +237,7 @@ export default function HomePage() {
       </section>
       <section>
         <HomeSection<Book>
-          title={t("foods_book")}
+          title={t("Projects")}
           subTitle={t("view_all")}
           subTitleLink={""}
           className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
@@ -196,12 +256,12 @@ export default function HomePage() {
           }}
           tabLList={[
             {
-              name: "books",
-              url: "foods-books",
+              name: "All Projects",
+              url: "projects",
             },
             {
-              name: "audio_books",
-              url: "foods-books",
+              name: "Latest Projects",
+              url: "projects",
             },
           ]}
           shimmer={
