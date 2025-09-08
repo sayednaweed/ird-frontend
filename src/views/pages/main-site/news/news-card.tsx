@@ -3,11 +3,13 @@ import type { News } from "@/database/models";
 import { useOnScreen } from "@/hook/use-on-screen";
 import { animated, useSpring } from "@react-spring/web";
 import React from "react";
+import { Link } from "react-router";
 
 interface NewsCardProps {
   news: News;
   delay: number;
 }
+
 const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
   const ref = React.useRef<HTMLDivElement | null>(null);
   const isVisible = useOnScreen(ref);
@@ -20,33 +22,63 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
     config: { duration: 400 },
     delay: delay, // stagger after image
   });
+
   return (
     <animated.div
       ref={ref}
       style={contentSpring}
-      className="w-60 p-4 pb-10 relative border h-[340px] rounded-md shadow hover:shadow-lg transition"
+      className="group relative w-full rounded-xl overflow-hidden border bg-card shadow-sm hover:shadow-md transition-all duration-300"
     >
-      <div className="relative">
+      {/* Image */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden">
         <CachedImage
           src={news.image}
-          shimmerClassName="min-w-full h-full object-cover h-[200px] rounded-t-lg sm:h-[200px]"
-          className="min-w-full shadow-lg object-cover rounded-t-lg h-[200px] sm:h-[200px]"
           routeIdentifier={"public"}
+          shimmerClassName="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-[1.03]"
         />
-      </div>
-      <h3 className="text-start font-semibold text-primary mb-1 line-clamp-2">
-        {news.title}
-      </h3>
-      <div className="text-sm text-primary/80 text-start mb-1 line-clamp-3">
-        {news?.contents}
+        {/* Bottom gradient overlay */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent" />
+        {/* Quick meta on image */}
+        <div className="absolute left-3 top-3 flex items-center gap-2">
+          {news.news_type && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/90 text-primary shadow-sm">
+              {news.news_type}
+            </span>
+          )}
+          {news.date && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white/95">
+              {new Date(news.date).toLocaleDateString()}
+            </span>
+          )}
+        </div>
       </div>
 
-      <a
-        href={""}
-        className="inline-block text-blue-600 font-medium hover:underline absolute bottom-3 text-sm"
-      >
-        Learn More →
-      </a>
+      {/* Content */}
+      <div className="p-4">
+        <h3 className="text-base font-semibold tracking-tight text-primary line-clamp-2 mb-1">
+          {news.title}
+        </h3>
+        <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+          {news?.contents}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {news.priority && (
+              <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
+                {news.priority}
+              </span>
+            )}
+          </div>
+          <Link
+            to={`/news/${news.id}`}
+            className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+          >
+            Learn more →
+          </Link>
+        </div>
+      </div>
     </animated.div>
   );
 };

@@ -27,12 +27,15 @@ export default function NewsPage() {
   };
   const shimmer = useMemo(
     () => (
-      <div className="shadow-lg flex flex-col col-span-full w-[94%] gap-y-2 pb-2 xxl:w-[320px] rounded-lg bg-transparent m-8 mx-auto">
-        <Shimmer className="shadow-lg rounded-t-lg h-[200px] sm:h-[200px]" />
-        <Shimmer className="h-7 rounded w-[90%] mx-auto" />
-        <Shimmer className="h-20 rounded w-[90%] mx-auto" />
-        <Shimmer className="h-7 rounded w-[90%] mx-auto" />
-        <Shimmer className="h-7 rounded w-[90%] mx-auto" />
+      <div className="rounded-xl overflow-hidden border bg-card shadow-sm">
+        <div className="relative w-full aspect-[16/9]">
+          <Shimmer className="absolute inset-0 w-full h-full" />
+        </div>
+        <div className="p-4 space-y-2">
+          <Shimmer className="h-5 w-3/4 rounded" />
+          <Shimmer className="h-4 w-full rounded" />
+          <Shimmer className="h-4 w-5/6 rounded" />
+        </div>
       </div>
     ),
     []
@@ -49,8 +52,9 @@ export default function NewsPage() {
         scrollThreshold={120}
         shimmer={<>{shimmer}</>}
         style={{
-          parentContainerClassName: "py-40 px-20",
-          containerClassName: "flex flex-wrap justify-center",
+          parentContainerClassName: "py-10 px-4 md:px-8 xl:px-16",
+          containerClassName:
+            "grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]",
         }}
         scrollableId="layout_parent"
       />
