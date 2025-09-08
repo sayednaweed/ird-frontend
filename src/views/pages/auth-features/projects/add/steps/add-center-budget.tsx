@@ -19,7 +19,6 @@ export default function AddCenterBudget() {
     const { name, value } = e.target;
     setUserData((prev: any) => ({ ...prev, [name]: value }));
   };
-
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-x-4 xl:gap-x-12 lg:items-baseline mt-4 gap-y-3 w-full lg:w-full">
       <CustomDatePicker

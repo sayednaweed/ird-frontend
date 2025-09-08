@@ -145,7 +145,7 @@ export default function EditCenterBudgetTab(props: EditCenterBudgetTabProps) {
     const { name, value } = e.target;
     setUserData((prev: any) => ({ ...prev, [name]: value }));
   };
-  console.log(userData?.currency);
+
   return (
     <Card>
       <CardHeader className="space-y-0">
