@@ -8,6 +8,7 @@ import CustomInput from "@/components/custom-ui/input/CustomInput";
 import MultiTabTextarea from "@/components/custom-ui/input/mult-tab/MultiTabTextarea";
 import { StepperContext } from "@/components/custom-ui/stepper/StepperContext";
 import { CountryEnum } from "@/database/model-enums";
+import CustomPhoneInput from "@/components/custom-ui/input/custom-phone-input";
 
 export default function DirectorInformationSubmitTab() {
   const { userData, setUserData, error } = useContext(StepperContext);
@@ -93,19 +94,15 @@ export default function DirectorInformationSubmitTab() {
         </MultiTabInput>
       </BorderContainer>
 
-      <CustomInput
-        size_="sm"
-        dir="ltr"
-        required={true}
-        requiredHint={`* ${t("required")}`}
-        className="rtl:text-end"
+      <CustomPhoneInput
+        value={userData["director_contact"]}
         label={t("director_contact")}
-        placeholder={t("enter_ur_pho_num")}
-        defaultValue={userData["director_contact"]}
-        type="text"
+        required={true}
+        parentClassName={"h-fit"}
+        requiredHint={`* ${t("required")}`}
+        onChange={handleChange}
         name="director_contact"
         errorMessage={error.get("director_contact")}
-        onChange={handleChange}
       />
       <CustomInput
         size_="sm"

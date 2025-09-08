@@ -262,7 +262,7 @@ export default function OrganizationFormSubmit() {
                   },
                   {
                     name: "director_contact",
-                    rules: ["required"],
+                    rules: ["required", "phone"],
                   },
                   {
                     name: "director_email",

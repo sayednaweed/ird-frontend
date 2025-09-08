@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import type { ValidateItem } from "@/validation/types";
 import { CountryEnum, PermissionEnum } from "@/database/model-enums";
 import CustomDatePicker from "@/components/custom-ui/datePicker/custom-date-picker";
+import CustomPhoneInput from "@/components/custom-ui/input/custom-phone-input";
 interface EditOrganizationInformation {
   registration_no: string;
   name_english: string | undefined;
@@ -230,22 +231,17 @@ export default function EditInformationTab(props: EditInformationTabProps) {
               mode="single"
               readonly={!hasEdit}
             />
-            <CustomInput
-              size_="sm"
-              dir="ltr"
+            <CustomPhoneInput
+              label={t("contact")}
               required={true}
               requiredHint={`* ${t("required")}`}
-              className="rtl:text-end"
-              label={t("contact")}
-              placeholder={t("enter_ur_pho_num")}
-              defaultValue={organizationData["contact"]}
-              type="text"
-              name="contact"
-              errorMessage={error.get("contact")}
               onChange={(e: any) => {
                 const { name, value } = e.target;
                 setOrganizationData({ ...organizationData, [name]: value });
               }}
+              value={organizationData["contact"]}
+              name="contact"
+              errorMessage={error.get("contact")}
               readOnly={!hasEdit}
             />
             <CustomInput

@@ -35,6 +35,7 @@ import EditDetailsTab from "@/views/pages/auth-features/projects/edit/steps/edit
 import { toast } from "sonner";
 import { useDownloadStore } from "@/components/custom-ui/download-manager/download-store";
 import EditChecklistTab from "@/views/pages/auth-features/projects/edit/steps/edit-checklist-tab";
+import { generateUUID } from "@/lib/utils";
 
 export default function ProjectEditPage() {
   const { user } = useGeneralAuthState();
@@ -169,7 +170,7 @@ export default function ProjectEditPage() {
               <IconButton
                 onClick={() =>
                   start({
-                    id: crypto.randomUUID(),
+                    id: generateUUID(),
                     filename: `${userData.name}.zip`,
                     url: `projects/unsigned/mou/${id}`,
                   })

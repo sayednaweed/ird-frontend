@@ -40,6 +40,7 @@ import type { OrganizationInformation } from "@/lib/types";
 import OrganizationEditHeader from "@/views/pages/auth-features/organization/edit/organization-edit-header";
 import { EditOrganizationPassword } from "@/views/pages/auth-features/organization/edit/steps/edit-organization-password";
 import { useDownloadStore } from "@/components/custom-ui/download-manager/download-store";
+import { generateUUID } from "@/lib/utils";
 
 export interface IOrganizationInformation {
   organizationInformation: OrganizationInformation;
@@ -262,7 +263,7 @@ export default function OrganizationEditPage() {
                   <IconButton
                     onClick={() =>
                       start({
-                        id: crypto.randomUUID(),
+                        id: generateUUID(),
                         filename: `${user.username}.zip`,
                         url: `organization/generate/registeration/${id}`,
                       })

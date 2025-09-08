@@ -1,6 +1,7 @@
 import CustomCheckbox from "@/components/custom-ui/checkbox/CustomCheckbox";
 import APICombobox from "@/components/custom-ui/combobox/APICombobox";
 import BorderContainer from "@/components/custom-ui/container/BorderContainer";
+import CustomPhoneInput from "@/components/custom-ui/input/custom-phone-input";
 import CustomInput from "@/components/custom-ui/input/CustomInput";
 import MultiTabInput from "@/components/custom-ui/input/mult-tab/MultiTabInput";
 import SingleTab from "@/components/custom-ui/input/mult-tab/parts/SingleTab";
@@ -76,19 +77,15 @@ export default function AdOrganizationStructure() {
           <SingleTab>pashto</SingleTab>
         </MultiTabInput>
       </BorderContainer>
-      <CustomInput
-        size_="sm"
-        dir="ltr"
+
+      <CustomPhoneInput
+        label={t("pro_manager_contact")}
         required={true}
         requiredHint={`* ${t("required")}`}
-        className="rtl:text-end"
-        label={t("pro_manager_contact")}
-        placeholder={t("contact")}
-        defaultValue={userData["pro_manager_contact"]}
-        type="text"
+        onChange={handleChange}
+        value={userData["pro_manager_contact"]}
         name="pro_manager_contact"
         errorMessage={error.get("pro_manager_contact")}
-        onChange={handleChange}
       />
       <CustomInput
         size_="sm"

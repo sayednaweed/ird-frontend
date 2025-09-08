@@ -97,7 +97,9 @@ export function ProjectTable() {
       endDate: endDate,
     };
     // 2. Send data
-    const response = await axiosClient.get(`projects`, {
+    const url =
+      user.role.role == RoleEnum.organization ? "projects-org" : "projects";
+    const response = await axiosClient.get(url, {
       params: {
         page: filters.page,
         per_page: count,
