@@ -76,6 +76,9 @@ const NewsPage = lazy(() => import("@/views/pages/main-site/news/news-page"));
 const NewsDetailPage = lazy(
   () => import("@/views/pages/main-site/news/news-detail-page")
 );
+const DonorsPage = lazy(
+  () => import("@/views/pages/main-site/donors/donors-page")
+);
 export const getAuthRouter = (
   user: User | Donor | Organization,
   authenticated: boolean
@@ -409,6 +412,7 @@ const site = (
     <Route index path="home" element={<HomePage />} />
     <Route path="news" element={<NewsPage />} />
     <Route path="news/:id" element={<NewsDetailPage />} />
+    <Route path="donors" element={<DonorsPage />} />
     <Route path="about_us" element={<AboutUsPage />} />
     <Route path="contact_us" element={<ContactUsPage />} />
     <Route path="faqs" element={<FaqsPage />} />

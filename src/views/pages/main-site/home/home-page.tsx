@@ -194,7 +194,7 @@ export default function HomePage() {
         <HomeSection<OrganizationListItem>
           title={t("Organizations")}
           subTitle={t("view_all")}
-          subTitleLink={""}
+          subTitleLink={"/organizations"}
           className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
           style={{
             tabContent: {
@@ -255,7 +255,7 @@ export default function HomePage() {
         <HomeSection<DonorListItem>
           title={t("Donors")}
           subTitle={t("view_all")}
-          subTitleLink={""}
+          subTitleLink={"/donors"}
           className="pb-12 pt-8 px-2 sm:px-12 xl:px-32"
           style={{
             tabContent: {
