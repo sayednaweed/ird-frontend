@@ -83,7 +83,9 @@ export default function HomePage() {
           : url === "donors" || url === "featured-donors"
           ? "donors"
           : url === "projects" || url === "featured-projects"
-          ? "projects"
+          ? url === "featured-projects" 
+            ? "projects/public?featured=1"
+            : "projects/public"
           : url;
 
       const cached = newsCache[url as keyof typeof newsCache];
@@ -93,9 +95,16 @@ export default function HomePage() {
       const token = useAuthStore.getState().token;
       const isOrg = endpoint.startsWith("organizations/public");
       const isDonor = endpoint === "donors";
-      const isProject = endpoint === "projects";
+      const isProject = endpoint.startsWith("projects/public");
       const params = isOrg || isDonor || isProject ? { per_page: 12, page: 1 } : { _limit: 12, _page: 1 };
-      const response = await axiosClient.get(endpoint, { params, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
+      const response = await axiosClient.get(endpoint, {
+        params,
+        // Don't send cookies/credentials to public endpoint to avoid strict CORS blocking
+        withCredentials: isOrg || isProject ? false : axiosClient.defaults.withCredentials,
+        headers: {
+          ...(token && !isOrg && !isProject ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
 
       if (response.status === 200) {
         if (isOrg) {
@@ -130,7 +139,11 @@ export default function HomePage() {
       if (!newsCache["news"]) {
         await fetch("news");
       }
+      if (!newsCache["organizations"]) {
+        await fetch("organizations");
+      }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   const loader = (
