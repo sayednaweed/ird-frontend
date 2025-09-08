@@ -60,7 +60,9 @@ export const validate = async (
           return;
         }
       } else if (rule == "phone") {
-        if (value.startsWith("+93") && value?.length < 12) {
+        console.log(value?.length < 12);
+
+        if (value.startsWith("+93") && value?.length != 12) {
           errMap.set(item.name, `${t(item.name)} ${t("afg_contact_val")}`);
         } else if (value?.length < 6) {
           errMap.set(item.name, `${t(item.name)} ${t("is_required")}`);

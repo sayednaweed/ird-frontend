@@ -68,7 +68,7 @@ export default function UserProfileInformation() {
       { name: "full_name", rules: ["required", "max:45", "min:3"] },
       { name: "email", rules: ["required", "max:45", "min:3"] },
     ];
-    if (userData.contact && userData.contact.length > 5) {
+    if (userData.contact) {
       validationItems.push({ name: "contact", rules: ["required", "phone"] });
     }
     if (!(await validate(validationItems, userData, setError))) {
