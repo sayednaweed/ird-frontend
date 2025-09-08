@@ -213,7 +213,7 @@ export default function OrganizationFormSubmit() {
                   },
                   { name: "abbr", rules: ["required"] },
                   { name: "type", rules: ["required"] },
-                  { name: "contact", rules: ["required"] },
+                  { name: "contact", rules: ["required", "phone"] },
                   { name: "email", rules: ["required"] },
                   { name: "country", rules: ["required"] },
                   { name: "establishment_date", rules: ["required"] },

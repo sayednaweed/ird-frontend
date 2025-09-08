@@ -16,6 +16,7 @@ export const StatusEnum = {
   pending_for_schedule: 11,
   has_comment: 12,
   scheduled: 13,
+  missed: 14,
 };
 
 export const ChecklistEnum = {

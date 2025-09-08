@@ -504,6 +504,22 @@ export type Schedule = {
   }[];
   passed: boolean;
 };
+export interface PresentationItem {
+  id: string;
+  start_time: string;
+  end_time: string;
+  project_id: number;
+  project_name: string;
+  comment: string;
+  status: BasicModel;
+  documents: {
+    name: string;
+    size: string;
+    path: string;
+    type: string;
+    checklist: string;
+  }[];
+}
 export interface Presentation {
   date: string;
   start_time: string;
@@ -513,19 +529,5 @@ export interface Presentation {
   lunch_end: string;
   schedule_status: string;
   schedule_status_id: number;
-  schedule_items: {
-    start_time: string;
-    end_time: string;
-    project_id: number;
-    project_name: string;
-    status_id: number;
-    status: string;
-    documents: {
-      name: string;
-      size: string;
-      path: string;
-      type: string;
-      checklist: string;
-    }[];
-  }[];
+  schedule_items: PresentationItem[];
 }

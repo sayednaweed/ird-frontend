@@ -1,24 +1,37 @@
+import PrimaryButton from "@/components/custom-ui/button/PrimaryButton";
+import APICombobox from "@/components/custom-ui/combobox/APICombobox";
+import ServerError from "@/components/custom-ui/resuseable/server-error";
 import NastranSpinner from "@/components/custom-ui/spinner/NastranSpinner";
-import type { Presentation } from "@/database/models";
+import CustomTextarea from "@/components/custom-ui/textarea/CustomTextarea";
+import { StatusEnum } from "@/database/model-enums";
+import type { Presentation, PresentationItem } from "@/database/models";
 import axiosClient from "@/lib/axois-client";
 import {
+  Check,
   ChevronDown,
   ChevronUp,
+  ClipboardCheck,
   Download,
   FileText,
-  FileWarning,
-  Folder,
+  Image,
+  PenLine,
 } from "lucide-react";
-import { useEffect, useState, type JSX } from "react";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type JSX,
+  type SetStateAction,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 
 // Icon map
 const fileTypeIcons: Record<string, JSX.Element> = {
-  pdf: <FileWarning className="w-5 h-5 text-red-500" />,
-  doc: <FileText className="w-5 h-5 text-blue-500" />,
-  default: <Folder className="w-5 h-5 text-gray-400" />,
+  pdf: <FileText className="w-5 h-5 text-orange-400" />,
+  doc: <FileText className="w-5 h-5 text-gray-400" />,
+  default: <Image className="w-5 h-5 text-gray-400" />,
 };
 
 const getFileIcon = (mimeType: string) => {
@@ -54,15 +67,8 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 export const ScheduleView: React.FC = () => {
   const { id } = useParams();
   const [schedule, setSchedule] = useState<Presentation | null>(null);
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
-  const [loadingComplete, setLoadingComplete] = useState<
-    Record<number, boolean>
-  >({});
+  const [storing, setStoring] = useState(false);
   const { t } = useTranslation();
-
-  const toggleExpand = (id: number) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   const loadInformation = async () => {
     try {
@@ -77,163 +83,310 @@ export const ScheduleView: React.FC = () => {
     loadInformation();
   }, []);
 
-  const markAsComplete = async (projectId: number) => {
-    setLoadingComplete((prev) => ({ ...prev, [projectId]: true }));
-    try {
-      // Assuming your API endpoint to update status:
-      await axiosClient.post(`schedules/mark-complete/${projectId}`);
-
-      toast.success(t("marked_as_complete"));
-
-      // Refresh schedule data
-      await loadInformation();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || t("failed_to_mark_complete"));
-    } finally {
-      setLoadingComplete((prev) => ({ ...prev, [projectId]: false }));
-    }
-  };
-
   if (!schedule) return <NastranSpinner />;
 
+  const saveData = async () => {
+    if (storing || id === undefined) {
+      setStoring(false);
+      return;
+    }
+    setStoring(true);
+    // 2. Store
+    try {
+      const pendingErrors: Record<string, string[]> = {};
+      let errorFound = false;
+
+      schedule.schedule_items.forEach((item: PresentationItem) => {
+        if (item.status.id == StatusEnum.pending) {
+          pendingErrors[item.project_id] = [
+            `${t("project")} ${item.project_name} ${t("is_pending")}`,
+          ];
+          errorFound = true;
+        }
+      });
+      if (errorFound) {
+        toast.error(<ServerError errors={pendingErrors} />);
+        return;
+      }
+      const response = await axiosClient.post("schedules/submit", {
+        id: id,
+        content: JSON.stringify(schedule),
+      });
+      if (response.status == 200) {
+        toast.success(response.data.message);
+      }
+    } catch (error: any) {
+      toast.error(<ServerError errors={error.response.data.errors} />);
+      console.log(error);
+    } finally {
+      setStoring(false);
+    }
+  };
   return (
-    <div className="w-full px-4 md:px-12 py-8 max-w-7xl mx-auto">
+    <div className="w-full px-4 md:px-12 py-8 max-[90%] mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-tertiary text-white p-8 rounded shadow-lg mb-12">
+      <div className="bg-gradient-to-br from-primary to-primary/85 text-white p-8 rounded shadow-lg">
         <h1 className="text-4xl font-extrabold mb-4">
           {t("schedule")}: {schedule.date}
         </h1>
-        <div className="grid md:grid-cols-2 gap-5 text-lg font-medium tracking-wide">
-          <p>
-            ⏰ <strong>{t("time")}:</strong> {schedule.start_time} –{" "}
-            {schedule.end_time}
-          </p>
-          <p>
-            🍽️ <strong>{t("lunch")}:</strong> {schedule.lunch_start} –{" "}
-            {schedule.lunch_end}
-          </p>
-          <p>
-            ⏳ <strong>{t("gap")}:</strong> {schedule.gap_between} mins
-          </p>
-          <p>
-            📋 <strong>{t("status")}:</strong>{" "}
-            <StatusBadge status={schedule.schedule_status} />
-          </p>
+        <div className="flex justify-between">
+          <div className="grid md:grid-cols-2 gap-5 text-lg font-medium tracking-wide">
+            <p>
+              ⏰ <strong>{t("time")}:</strong> {schedule.start_time} –{" "}
+              {schedule.end_time}
+            </p>
+            <p>
+              🍽️ <strong>{t("lunch")}:</strong> {schedule.lunch_start} –{" "}
+              {schedule.lunch_end}
+            </p>
+            <p>
+              ⏳ <strong>{t("gap")}:</strong> {schedule.gap_between} mins
+            </p>
+            <p>
+              📋 <strong>{t("status")}:</strong>{" "}
+              <StatusBadge status={schedule.schedule_status} />
+            </p>
+          </div>
+          <PrimaryButton
+            onClick={saveData}
+            className="items-center border bg-primary/5 hover:shadow-none shadow-none text-primary-foreground hover:bg-primary-foreground/10"
+          >
+            {t("submit")}
+            <ClipboardCheck className=" text-green-400" />
+          </PrimaryButton>
         </div>
       </div>
 
       {/* Schedule Items */}
-      <div className="space-y-8">
-        {schedule.schedule_items.map((item) => (
-          <div
-            key={item.project_id}
-            className="bg-white border border-gray-200 shadow-md rounded-2xl p-6 transition-shadow duration-300 hover:shadow-xl"
-          >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {item.project_name}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {item.start_time} – {item.end_time}
-                </p>
-              </div>
-              <div className="flex items-center gap-6">
-                <StatusBadge status={item.status} />
-                <button
-                  onClick={() => toggleExpand(item.project_id)}
-                  className="flex items-center text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer select-none"
-                  aria-expanded={expanded[item.project_id] ? "true" : "false"}
-                >
-                  {expanded[item.project_id] ? (
-                    <>
-                      <ChevronUp className="w-5 h-5 mr-1" /> {t("hide_doc")}
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-5 h-5 mr-1" /> {t("show_doc")}
-                    </>
-                  )}
-                </button>
+      <PresentationRow schedule={schedule} setSchedule={setSchedule} />
+    </div>
+  );
+};
 
-                {/* Show Complete button only if status is NOT completed */}
-                {item.status.toLowerCase() !== "completed" && (
-                  <button
-                    onClick={() => markAsComplete(item.project_id)}
-                    disabled={loadingComplete[item.project_id]}
-                    className={`ml-4 px-4 py-2 rounded-full text-white font-semibold transition ${
-                      loadingComplete[item.project_id]
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-green-600 hover:bg-green-700"
-                    }`}
-                  >
-                    {loadingComplete[item.project_id]
-                      ? t("marking...")
-                      : t("mark_as_complete")}
-                  </button>
-                )}
-              </div>
+export interface PresentationRowProps {
+  schedule: Presentation;
+  setSchedule: Dispatch<SetStateAction<Presentation | null>>;
+}
+const PresentationRow = (props: PresentationRowProps) => {
+  const { schedule, setSchedule } = props;
+  const [expandedDocs, setExpandedDocs] = useState<boolean>(false);
+  const [expandedDetail, setExpandedDetail] = useState<boolean>(false);
+  const { t } = useTranslation();
+  const updateScheduleItemStatus = (
+    projectId: number,
+    column: string,
+    newStatus: any
+  ) => {
+    setSchedule((prev) => {
+      if (!prev) return prev; // Handle null just in case
+
+      return {
+        ...prev,
+        schedule_items: prev.schedule_items.map((item) =>
+          item.project_id === projectId
+            ? { ...item, [column]: newStatus }
+            : item
+        ),
+      };
+    });
+  };
+
+  const onComplete = (scheduleItem: PresentationItem) => {
+    if (scheduleItem.status?.id == StatusEnum.pending) {
+      if (expandedDocs) {
+        setExpandedDocs(false);
+      }
+      setExpandedDetail(true);
+      toast.error(
+        `${t("project")} ${scheduleItem.project_name} ${t("is_pending")}`
+      );
+    }
+  };
+  return (
+    <div className="space-y-8 mt-1">
+      {schedule.schedule_items.map((scheduleItem) => (
+        <div
+          key={scheduleItem.project_id}
+          className="bg-white border border-gray-200 rounded px-6 pt-4"
+        >
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">
+                {scheduleItem.project_name}
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {scheduleItem.start_time} – {scheduleItem.end_time}
+              </p>
             </div>
-
-            {/* Documents Section */}
-            <div
-              className={`mt-6 overflow-hidden transition-all duration-300 ${
-                expanded[item.project_id] ? "max-h-[1000px]" : "max-h-0"
-              }`}
-            >
-              {expanded[item.project_id] && (
-                <>
-                  {item.documents.length === 0 ? (
-                    <p className="text-sm italic text-gray-400">
-                      {t("no_availble_doc")}
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {item.documents.map((doc, idx) => {
-                        const sizeKB = (Number(doc.size) / 1024).toFixed(1);
-                        const fileUrl = `${doc.path}`;
-                        return (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-4">
-                              {getFileIcon(doc.type)}
-                              <div>
-                                <p className="font-medium text-gray-800">
-                                  {doc.name}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {doc.checklist}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-xs text-gray-500">
-                                {sizeKB} KB
-                              </span>
-                              <a
-                                href={fileUrl}
-                                download
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:text-indigo-600"
-                                aria-label={`Download ${doc.name}`}
-                              >
-                                <Download className="w-5 h-5" />
-                              </a>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </>
-              )}
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => {
+                  if (expandedDetail) {
+                    setExpandedDetail(!expandedDetail);
+                  }
+                  setExpandedDocs(!expandedDocs);
+                }}
+                className="flex items-center text-indigo-900 font-semibold cursor-pointer select-none"
+                aria-expanded={expandedDocs ? "true" : "false"}
+              >
+                {expandedDocs ? (
+                  <>
+                    <ChevronUp className="w-5 h-5 mr-1" /> {t("hide_doc")}
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-5 h-5 mr-1" /> {t("show_doc")}
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  if (expandedDocs) {
+                    setExpandedDocs(false);
+                  }
+                  setExpandedDetail(!expandedDetail);
+                }}
+                className="flex items-center text-indigo-900 font-semibold cursor-pointer select-none"
+                aria-expanded={expandedDetail ? "true" : "false"}
+              >
+                {expandedDetail ? (
+                  <>
+                    <ChevronUp className="w-5 h-5 mr-1" /> {t("hid_pren_info")}
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-5 h-5 mr-1" />{" "}
+                    {t("sho_pren_info")}
+                  </>
+                )}
+              </button>
+              {/* Show Complete button only if status is NOT completed */}
+              <PrimaryButton
+                onClick={() => onComplete(scheduleItem)}
+                className="items-center border bg-primary/5 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-primary/10"
+              >
+                {scheduleItem.status.id != StatusEnum.pending ? (
+                  <>
+                    <h1 className=" text-green-400">
+                      {scheduleItem.status?.name}
+                    </h1>
+                    <Check className=" text-green-400" />
+                  </>
+                ) : (
+                  <>
+                    <h1>{scheduleItem.status?.name}</h1> <PenLine />
+                  </>
+                )}
+              </PrimaryButton>
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Documents Section */}
+          <div
+            className={`mt-6 overflow-hidden transition-all duration-300 ${
+              expandedDocs ? "max-h-[1000px]" : "max-h-0"
+            }`}
+          >
+            {expandedDocs && (
+              <>
+                {scheduleItem.documents.length === 0 ? (
+                  <p className="text-sm italic text-gray-400">
+                    {t("no_availble_doc")}
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {scheduleItem.documents.map((doc, idx) => {
+                      const sizeKB = (Number(doc.size) / 1024).toFixed(1);
+                      const fileUrl = `${doc.path}`;
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center gap-4">
+                            {getFileIcon(doc.type)}
+                            <div>
+                              <p className="font-medium text-gray-800">
+                                {doc.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {doc.checklist}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-xs text-gray-500">
+                              {sizeKB} KB
+                            </span>
+                            <a
+                              href={fileUrl}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-indigo-600"
+                              aria-label={`Download ${doc.name}`}
+                            >
+                              <Download className="w-5 h-5" />
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          {/* Documents Section */}
+          <div
+            className={`mt-6 py-12 flex flex-col gap-y-4 overflow-hidden transition-all duration-300 ${
+              expandedDetail ? "max-h-[1000px]" : "max-h-0"
+            }`}
+          >
+            {expandedDetail && (
+              <>
+                <APICombobox
+                  placeholderText={t("search_item")}
+                  errorText={t("no_item")}
+                  onSelect={(selection: any) =>
+                    updateScheduleItemStatus(
+                      scheduleItem.project_id,
+                      "status",
+                      selection
+                    )
+                  }
+                  lable={t("status")}
+                  parentClassName="sm:w-1/2 xl:w-1/3"
+                  required={true}
+                  requiredHint={`* ${t("required")}`}
+                  selectedItem={scheduleItem?.status.name}
+                  placeHolder={t("select_a")}
+                  apiUrl={"statuses/prensentation"}
+                  mode="single"
+                />
+                <CustomTextarea
+                  required={true}
+                  label={t("comment")}
+                  parentClassName="col-span-full"
+                  requiredHint={`* ${t("required")}`}
+                  name="comment"
+                  defaultValue={scheduleItem?.comment}
+                  placeholder={t("detail")}
+                  onChange={(e) => {
+                    const { value, name } = e.target;
+                    updateScheduleItemStatus(
+                      scheduleItem.project_id,
+                      name,
+                      value
+                    );
+                  }}
+                  rows={8}
+                />
+              </>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

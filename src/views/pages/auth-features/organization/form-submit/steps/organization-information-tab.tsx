@@ -2,6 +2,7 @@ import APICombobox from "@/components/custom-ui/combobox/APICombobox";
 import BorderContainer from "@/components/custom-ui/container/BorderContainer";
 import CustomDatePicker from "@/components/custom-ui/datePicker/custom-date-picker";
 import ConfirmationDialog from "@/components/custom-ui/dialog/confirmation-dialog";
+import CustomPhoneInput from "@/components/custom-ui/input/custom-phone-input";
 import CustomInput from "@/components/custom-ui/input/CustomInput";
 import MultiTabInput from "@/components/custom-ui/input/mult-tab/MultiTabInput";
 import SingleTab from "@/components/custom-ui/input/mult-tab/parts/SingleTab";
@@ -193,19 +194,15 @@ export default function OrganizationInformationTab(
         mode="single"
         readonly={true}
       />
-      <CustomInput
-        size_="sm"
-        dir="ltr"
+
+      <CustomPhoneInput
         required={true}
         requiredHint={`* ${t("required")}`}
-        className="rtl:text-end"
         label={t("contact")}
-        placeholder={t("enter_ur_pho_num")}
-        defaultValue={userData["contact"]}
-        type="text"
+        onChange={handleChange}
+        value={userData.contact}
         name="contact"
         errorMessage={error.get("contact")}
-        onChange={handleChange}
       />
       <CustomInput
         size_="sm"
