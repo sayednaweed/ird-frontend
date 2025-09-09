@@ -224,7 +224,7 @@ export default function OrganizationInformationTab(
         name="moe_registration_no"
         label={t("moe_registration_no")}
         defaultValue={userData["moe_registration_no"]}
-        placeholder={t("enter_your_email")}
+        placeholder={t("enter")}
         type="moe_registration_no"
         errorMessage={error.get("moe_registration_no")}
         onChange={handleChange}

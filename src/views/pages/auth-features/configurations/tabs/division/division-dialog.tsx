@@ -16,7 +16,9 @@ import { setServerError, validate } from "@/validation/validation";
 import { toast } from "sonner";
 import Shimmer from "@/components/custom-ui/shimmer/shimmer";
 import type { BasicModel } from "@/database/models";
-import CustomInput from "@/components/custom-ui/input/CustomInput";
+import BorderContainer from "@/components/custom-ui/container/BorderContainer";
+import MultiTabInput from "@/components/custom-ui/input/mult-tab/MultiTabInput";
+import SingleTab from "@/components/custom-ui/input/mult-tab/parts/SingleTab";
 
 export interface RolesDialogProps {
   onComplete: (division: BasicModel, isEdited: boolean) => void;
@@ -29,9 +31,9 @@ export default function RolesDialog(props: RolesDialogProps) {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState(new Map<string, string>());
   const [userData, setUserData] = useState({
-    english: "",
-    farsi: "",
-    pashto: "",
+    name_english: "",
+    name_farsi: "",
+    name_pashto: "",
   });
   const { modelOnRequestHide } = useModelOnRequestHide();
   const { t } = useTranslation();
@@ -59,15 +61,15 @@ export default function RolesDialog(props: RolesDialogProps) {
       const passed = await validate(
         [
           {
-            name: "english",
+            name: "name_english",
             rules: ["required", "max:100", "min:3"],
           },
           {
-            name: "farsi",
+            name: "name_farsi",
             rules: ["required", "max:100", "min:3"],
           },
           {
-            name: "pashto",
+            name: "name_pashto",
             rules: ["required", "max:100", "min:3"],
           },
         ],
@@ -78,9 +80,9 @@ export default function RolesDialog(props: RolesDialogProps) {
       // 2. Store
       const formData = new FormData();
       if (division?.id) formData.append("id", division?.id.toString());
-      formData.append("english", userData.english);
-      formData.append("farsi", userData.farsi);
-      formData.append("pashto", userData.pashto);
+      formData.append("english", userData.name_english);
+      formData.append("farsi", userData.name_farsi);
+      formData.append("pashto", userData.name_pashto);
       const response = division
         ? await axiosClient.post("divisions", formData, {
             headers: {
@@ -112,10 +114,7 @@ export default function RolesDialog(props: RolesDialogProps) {
       <Shimmer className="h-12" />
     </CardContent>
   );
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
-  };
+
   return (
     <Card className="w-full px-2 md:w-fit md:min-w-[700px] self-center bg-card my-12">
       <CardHeader className="relative text-start">
@@ -129,59 +128,40 @@ export default function RolesDialog(props: RolesDialogProps) {
       ) : (
         <>
           <CardContent>
-            <CustomInput
-              size_="sm"
-              dir="ltr"
-              className="rtl:text-end"
+            <BorderContainer
+              title={t("name")}
               required={true}
-              requiredHint={`* ${t("required")}`}
-              placeholder={t("translate_en")}
-              defaultValue={userData.english}
-              type="text"
-              name="english"
-              errorMessage={error.get("english")}
-              onChange={handleChange}
-              startContentDark={true}
-              startContent={
-                <h1 className="font-bold text-primary-foreground text-[11px] mx-auto">
-                  {t("en")}
-                </h1>
-              }
-            />
-            <CustomInput
-              size_="sm"
-              required={true}
-              requiredHint={`* ${t("required")}`}
-              placeholder={t("translate_fa")}
-              defaultValue={userData.farsi}
-              type="text"
-              name="farsi"
-              errorMessage={error.get("farsi")}
-              onChange={handleChange}
-              startContentDark={true}
-              startContent={
-                <h1 className="font-bold text-primary-foreground text-[11px] mx-auto">
-                  {t("fa")}
-                </h1>
-              }
-            />
-            <CustomInput
-              size_="sm"
-              required={true}
-              requiredHint={`* ${t("required")}`}
-              placeholder={t("translate_ps")}
-              defaultValue={userData.pashto}
-              type="text"
-              name="pashto"
-              errorMessage={error.get("pashto")}
-              onChange={handleChange}
-              startContentDark={true}
-              startContent={
-                <h1 className="font-bold text-primary-foreground text-[11px] mx-auto">
-                  {t("ps")}
-                </h1>
-              }
-            />
+              parentClassName="p-t-4 pb-0 px-0"
+              className="grid grid-cols-1 gap-y-3"
+            >
+              <MultiTabInput
+                optionalKey={"optional_lang"}
+                onTabChanged={(key: string, tabName: string) => {
+                  setUserData((prev: any) => ({
+                    ...prev,
+                    [key]: tabName,
+                    optional_lang: tabName,
+                  }));
+                }}
+                onChanged={(value: string, name: string) => {
+                  setUserData((prev: any) => ({
+                    ...prev,
+                    [name]: value,
+                  }));
+                }}
+                name="name"
+                highlightColor="bg-tertiary"
+                userData={userData}
+                errorData={error}
+                placeholder={t("name")}
+                className="rtl:text-xl-rtl rounded-none border-t border-x-0 border-b-0"
+                tabsClassName="gap-x-5 px-3"
+              >
+                <SingleTab>english</SingleTab>
+                <SingleTab>farsi</SingleTab>
+                <SingleTab>pashto</SingleTab>
+              </MultiTabInput>
+            </BorderContainer>
           </CardContent>
           <CardFooter className="flex flex-wrap gap-4 justify-center xxl:justify-between">
             <Button

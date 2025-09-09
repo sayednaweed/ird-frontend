@@ -19,7 +19,7 @@ import TableRowIcon from "@/components/custom-ui/table/TableRowIcon";
 import ChecklistDialog from "./checklist-dialog";
 import type { CheckList, UserPermission } from "@/database/models";
 import { toast } from "sonner";
-import { ChecklistEnum, PermissionEnum } from "@/database/model-enums";
+import { CheckListTypeEnum, PermissionEnum } from "@/database/model-enums";
 import Shimmer from "@/components/custom-ui/shimmer/shimmer";
 import BooleanStatusButton from "@/components/custom-ui/button/BooleanStatusButton";
 interface ChecklistTabProps {
@@ -234,9 +234,16 @@ export default function ChecklistTab(props: ChecklistTabProps) {
                       style: string;
                       value?: string;
                     } {
-                      return ChecklistEnum.user === checklist.type_id
+                      return CheckListTypeEnum.organization_registeration ===
+                        checklist.type_id
                         ? {
                             style: "border-green-500/90",
+                            value: checklist.type,
+                          }
+                        : CheckListTypeEnum.project_registeration ===
+                          checklist.type_id
+                        ? {
+                            style: "border-orange-500/90",
                             value: checklist.type,
                           }
                         : {
