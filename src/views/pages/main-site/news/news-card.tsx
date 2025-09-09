@@ -50,7 +50,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
       className="group relative w-full rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-[4px] hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900"
     >
       {/* Top gradient accent */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-500 via-sky-400 to-emerald-400 opacity-90" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-300 opacity-90" />
 
       {/* Image */}
       <div className="relative w-full aspect-[16/9] overflow-hidden">
