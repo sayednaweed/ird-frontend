@@ -4,6 +4,7 @@ import { useOnScreen } from "@/hook/use-on-screen";
 import { animated, useSpring } from "@react-spring/web";
 import React from "react";
 import { Link } from "react-router";
+import { Tag, Calendar, Book } from "lucide-react";
 
 interface NewsCardProps {
   news: News;
@@ -42,13 +43,13 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
         {/* Quick meta on image */}
         <div className="absolute left-3 top-3 flex items-center gap-2">
           {news.news_type && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/90 text-primary shadow-sm">
-              {news.news_type}
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/90 text-primary shadow-sm">
+              <Tag className="w-3 h-3" /> {news.news_type}
             </span>
           )}
           {news.date && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white/95">
-              {new Date(news.date).toLocaleDateString()}
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white/95">
+              <Calendar className="w-3 h-3" /> {new Date(news.date).toLocaleDateString()}
             </span>
           )}
         </div>
@@ -64,17 +65,12 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
         </p>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {news.priority && (
-              <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
-                {news.priority}
-              </span>
-            )}
-          </div>
+        
           <Link
             to={`/news/${news.id}`}
-            className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-800 rounded-full px-2 py-1 hover:text-slate-200 hover:underline"
           >
+            <Book className="w-3 h-3" />
             Read more
           </Link>
         </div>

@@ -15,6 +15,7 @@ export interface HomeSectionProps<T> {
     url: string
   ) => Promise<{ data: T[]; tab: string; failed: boolean }>;
   children: (data: T) => React.ReactNode;
+  renderAll?: (list: T[]) => React.ReactNode;
   tabLList: {
     name: string;
     url: string;
@@ -40,6 +41,7 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     title,
     subTitleLink,
     children,
+    renderAll,
     tabLList,
     fetch,
     style,
@@ -98,7 +100,7 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
         msOverflowStyle: "none", // IE 10+
       }}
     >
-      {list && list?.map((data: T) => children(data))}
+      {list && (renderAll ? renderAll(list) : list.map((data: T) => children(data)))}
     </TabsContent>
   ));
   return (

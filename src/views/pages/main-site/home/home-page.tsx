@@ -5,11 +5,12 @@ import axiosClient from "@/lib/axois-client";
 import HomeHeader from "@/views/pages/main-site/home/parts/home-header";
 import HomeSection from "@/views/pages/main-site/home/parts/home-section";
 import NewsCard from "@/views/pages/main-site/news/news-card";
+import TrustedByDonors from "@/views/pages/main-site/donors/donors-slider";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth/auth-store";
-import { Building2, DollarSign, CalendarRange, BadgeCheck, Mail, Phone, Building } from "lucide-react";
+import { Building2, DollarSign, CalendarRange, BadgeCheck } from "lucide-react";
 
 interface NewsListItem {
   id: number;
@@ -277,50 +278,17 @@ export default function HomePage() {
               url: "donors",
             }
           ]}
-          shimmer={
-            <>
-              {loader}
-              {loader}
-              {loader}
-            </>
-          }
-        >
-          {(data) => (
-            <Card
-              key={data.id}
-              className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[220px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1"
-            >
-              {/* Header */}
-              <CardContent className="p-6 pb-3">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex items-center justify-center rounded-full bg-black text-white  font-semibold w-12 h-12 ">
-                    {(data.abbr || data.name || data.username || "").substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Building className="w-6 h-6 text-slate-500 shrink-0 bg-orange-500 rounded-md p-1 text-white" />
-                      <h3 className="font-semibold text-slate-900 tracking-tight line-clamp-1">{data.name}</h3>
-                    </div>
-                    <div className="flex items-center gap-2 text-[13px] text-slate-600 min-w-0">
-                      <Mail className="w-6 h-6 text-slate-500 shrink-0 bg-blue-400 rounded-md p-1 text-white mt-1" />
-                      <span className="truncate">{data.email}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-
-              {/* Footer */}
-              <CardFooter className="flex items-center justify-between px-6 pb-5 pt-0 border-t border-slate-100">
-                <span className="flex items-center gap-2 text-[13px] text-slate-600">
-                  <Phone className="w-6 h-6 text-slate-500 shrink-0 bg-green-500 rounded-md p-1 text-white mt-1" />
-                  <span className="truncate">{data.contact}</span>
-                </span>
-                <span className="text-[12px] text-slate-300 line-clamp-1 bg-slate-800 rounded-full p-1">
-                  Since: {new Date(data.created_at).toLocaleDateString()}
-                </span>
-              </CardFooter>
-            </Card>
+          shimmer={<div className="h-24" />}
+          renderAll={(list) => (
+            <div className="col-span-full">
+              <TrustedByDonors
+                items={list.map((d) => ({ id: d.id, name: d.name, profile: d.profile }))}
+                speedMs={10000}
+              />
+            </div>
           )}
+        >
+          {() => null}
         </HomeSection>
       </section>
       <section>
