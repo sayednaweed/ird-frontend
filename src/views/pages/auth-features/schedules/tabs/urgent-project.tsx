@@ -173,13 +173,14 @@ export function UrgentProject(props: CustomProjectSelectProps) {
             apiUrl={"projects/with/name"}
             mode="single"
             cacheData={false}
+            readonly={schedule.passed}
           />
           <div className="mt-2">
             <CheckListChooser
               donwloadUrl={add ? "media/temporary" : "media/private"}
               key={userData?.document}
               number={undefined}
-              hasEdit={true}
+              hasEdit={!schedule.passed}
               url={`${
                 import.meta.env.VITE_API_BASE_URL
               }/api/v1/files/single/upload`}

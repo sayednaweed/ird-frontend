@@ -43,6 +43,7 @@ export default function AddOrEditSchedule() {
       }),
     []
   );
+
   const loadList = async () => {
     if (paramData.isValid) {
       return {

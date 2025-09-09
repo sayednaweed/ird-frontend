@@ -41,6 +41,7 @@ export function NormalProject(props: CustomProjectSelectProps) {
         type="text"
         name="presentation_count"
         onChange={handleChange}
+        disabled={schedule.passed}
       />
     </div>
   );

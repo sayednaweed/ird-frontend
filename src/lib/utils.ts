@@ -243,10 +243,10 @@ export function getLangCode(lang: string) {
 export const isStartDateBigger = (
   startDate: DateObject,
   endDate: DateObject,
-  message: string
+  message?: string
 ) => {
   if (startDate && endDate && startDate > endDate) {
-    toast.error(message);
+    if (message) toast.error(message);
     return true;
   }
   return false;

@@ -144,16 +144,17 @@ export const useDownloadStore = create<State>()(
 
         try {
           const queryString = qs.stringify(next.params, { encode: true });
-          let response = await fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/${
-              next.url
-            }?${queryString}`,
-            {
-              signal: controller.signal,
-              headers: received > 0 ? { Range: `bytes=${received}-` } : {},
-              credentials: "include", // include cookies if needed
-            }
-          );
+          console.log(queryString);
+          const url = queryString
+            ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/${
+                next.url
+              }?${queryString}`
+            : `${import.meta.env.VITE_API_BASE_URL}/api/v1/${next.url}`;
+          let response = await fetch(url, {
+            signal: controller.signal,
+            headers: received > 0 ? { Range: `bytes=${received}-` } : {},
+            credentials: "include", // include cookies if needed
+          });
           if (response.status === 403) {
             await refreshAccessToken();
             response = await fetch(

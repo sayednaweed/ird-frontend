@@ -8,6 +8,7 @@ import PrimaryButton from "@/components/custom-ui/button/PrimaryButton";
 import APICombobox from "@/components/custom-ui/combobox/APICombobox";
 import { useDownloadStore } from "@/components/custom-ui/download-manager/download-store";
 import ServerError from "@/components/custom-ui/resuseable/server-error";
+import ButtonSpinner from "@/components/custom-ui/spinner/ButtonSpinner";
 import NastranSpinner from "@/components/custom-ui/spinner/NastranSpinner";
 import CustomTextarea from "@/components/custom-ui/textarea/CustomTextarea";
 import { ScheduleStatusEnum, StatusEnum } from "@/database/model-enums";
@@ -178,10 +179,14 @@ export const ScheduleView: React.FC = () => {
           {schedule.schedule_status_id == ScheduleStatusEnum.Scheduled && (
             <PrimaryButton
               onClick={saveData}
-              className="items-center border bg-primary/5 hover:shadow-none shadow-none dark:text-card-foreground hover:bg-primary-foreground/10"
+              className={`items-center border bg-primary/5 hover:shadow-none shadow-none dark:text-card-foreground hover:bg-primary-foreground/10 ${
+                storing && "pointer-events-none"
+              }`}
             >
-              {t("submit")}
-              <ClipboardCheck className=" text-green-400" />
+              <ButtonSpinner className=" gap-x-2" loading={storing}>
+                {t("submit")}
+                <ClipboardCheck className=" text-green-400" />
+              </ButtonSpinner>
             </PrimaryButton>
           )}
         </div>
