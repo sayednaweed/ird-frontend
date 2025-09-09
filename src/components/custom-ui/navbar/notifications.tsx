@@ -205,7 +205,7 @@ export const NotificationItem = ({
         if (item.action_url) navigate(item.action_url, { replace: true });
       }}
     >
-      <h1 className="flex-1 line-clamp-2">{item.message}</h1>
+      <h1 className="flex-1 line-clamp-4">{item.message}</h1>
       <h1 className="text-primary/80">
         {calculateCreatedHours(item.created_at)}
       </h1>

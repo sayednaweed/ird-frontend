@@ -1,9 +1,16 @@
+import {
+  Breadcrumb,
+  BreadcrumbHome,
+  BreadcrumbItem,
+  BreadcrumbSeparator,
+} from "@/components/custom-ui/breadcrumb/Breadcrumb";
 import PrimaryButton from "@/components/custom-ui/button/PrimaryButton";
 import APICombobox from "@/components/custom-ui/combobox/APICombobox";
+import { useDownloadStore } from "@/components/custom-ui/download-manager/download-store";
 import ServerError from "@/components/custom-ui/resuseable/server-error";
 import NastranSpinner from "@/components/custom-ui/spinner/NastranSpinner";
 import CustomTextarea from "@/components/custom-ui/textarea/CustomTextarea";
-import { StatusEnum } from "@/database/model-enums";
+import { ScheduleStatusEnum, StatusEnum } from "@/database/model-enums";
 import type { Presentation, PresentationItem } from "@/database/models";
 import axiosClient from "@/lib/axois-client";
 import {
@@ -12,6 +19,7 @@ import {
   ChevronUp,
   ClipboardCheck,
   Download,
+  Eye,
   FileText,
   Image,
   PenLine,
@@ -24,7 +32,7 @@ import {
   type SetStateAction,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 // Icon map
@@ -69,7 +77,10 @@ export const ScheduleView: React.FC = () => {
   const [schedule, setSchedule] = useState<Presentation | null>(null);
   const [storing, setStoring] = useState(false);
   const { t } = useTranslation();
-
+  const navigate = useNavigate();
+  const handleGoHome = () => navigate("/dashboard", { replace: true });
+  const handleSchedules = () =>
+    navigate("/dashboard/schedules", { replace: true });
   const loadInformation = async () => {
     try {
       const res = await axiosClient.get(`schedules/present/${id}`);
@@ -110,10 +121,11 @@ export const ScheduleView: React.FC = () => {
       }
       const response = await axiosClient.post("schedules/submit", {
         id: id,
-        content: JSON.stringify(schedule),
+        schedule_items: schedule.schedule_items,
       });
       if (response.status == 200) {
         toast.success(response.data.message);
+        navigate("/dashboard/schedules", { replace: true });
       }
     } catch (error: any) {
       toast.error(<ServerError errors={error.response.data.errors} />);
@@ -123,14 +135,30 @@ export const ScheduleView: React.FC = () => {
     }
   };
   return (
-    <div className="w-full px-4 md:px-12 py-8 max-[90%] mx-auto">
+    <div className="w-full px-2 pt-2">
+      <Breadcrumb>
+        <BreadcrumbHome onClick={handleGoHome} />
+        <BreadcrumbSeparator />
+        <BreadcrumbItem onClick={handleSchedules}>
+          {t("schedules")}
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem onClick={() => navigate(-1)}>{id}</BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem className=" text-primary">
+          {t("start_resentation")}
+        </BreadcrumbItem>
+      </Breadcrumb>
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/85 text-white p-8 rounded shadow-lg">
-        <h1 className="text-4xl font-extrabold mb-4">
-          {t("schedule")}: {schedule.date}
+      <div className="bg-gradient-to-br mt-4 from-primary to-primary/85 dark:from-card dark:to-card dark:text-card-foreground text-primary-foreground p-8 rounded shadow-lg">
+        <h1 className="text-2xl font-extrabold mb-4 flex items-baseline gap-x-3">
+          {t("schedule")}:
+          <span className="text-lg text-primary-foreground/80">
+            {schedule.date}
+          </span>
         </h1>
         <div className="flex justify-between">
-          <div className="grid md:grid-cols-2 gap-5 text-lg font-medium tracking-wide">
+          <div className="grid md:grid-cols-2 gap-5 text-xl-ltr font-medium tracking-wide">
             <p>
               ⏰ <strong>{t("time")}:</strong> {schedule.start_time} –{" "}
               {schedule.end_time}
@@ -147,18 +175,24 @@ export const ScheduleView: React.FC = () => {
               <StatusBadge status={schedule.schedule_status} />
             </p>
           </div>
-          <PrimaryButton
-            onClick={saveData}
-            className="items-center border bg-primary/5 hover:shadow-none shadow-none text-primary-foreground hover:bg-primary-foreground/10"
-          >
-            {t("submit")}
-            <ClipboardCheck className=" text-green-400" />
-          </PrimaryButton>
+          {schedule.schedule_status_id == ScheduleStatusEnum.Scheduled && (
+            <PrimaryButton
+              onClick={saveData}
+              className="items-center border bg-primary/5 hover:shadow-none shadow-none dark:text-card-foreground hover:bg-primary-foreground/10"
+            >
+              {t("submit")}
+              <ClipboardCheck className=" text-green-400" />
+            </PrimaryButton>
+          )}
         </div>
       </div>
 
       {/* Schedule Items */}
-      <PresentationRow schedule={schedule} setSchedule={setSchedule} />
+      <PresentationRow
+        readonly={schedule.schedule_status_id != ScheduleStatusEnum.Scheduled}
+        schedule={schedule}
+        setSchedule={setSchedule}
+      />
     </div>
   );
 };
@@ -166,11 +200,14 @@ export const ScheduleView: React.FC = () => {
 export interface PresentationRowProps {
   schedule: Presentation;
   setSchedule: Dispatch<SetStateAction<Presentation | null>>;
+  readonly: boolean;
 }
 const PresentationRow = (props: PresentationRowProps) => {
-  const { schedule, setSchedule } = props;
+  const { schedule, setSchedule, readonly } = props;
   const [expandedDocs, setExpandedDocs] = useState<boolean>(false);
   const [expandedDetail, setExpandedDetail] = useState<boolean>(false);
+  const start = useDownloadStore((s) => s.startDownload);
+
   const { t } = useTranslation();
   const updateScheduleItemStatus = (
     projectId: number,
@@ -203,22 +240,22 @@ const PresentationRow = (props: PresentationRowProps) => {
     }
   };
   return (
-    <div className="space-y-8 mt-1">
+    <div className="space-y-8 mt-1 pb-16">
       {schedule.schedule_items.map((scheduleItem) => (
         <div
           key={scheduleItem.project_id}
-          className="bg-white border border-gray-200 rounded px-6 pt-4"
+          className=" bg-card border rounded px-6 pt-4"
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-primary">
                 {scheduleItem.project_name}
               </h2>
               <p className="text-sm text-gray-500 mt-1">
                 {scheduleItem.start_time} – {scheduleItem.end_time}
               </p>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 text-sm">
               <button
                 onClick={() => {
                   if (expandedDetail) {
@@ -226,7 +263,7 @@ const PresentationRow = (props: PresentationRowProps) => {
                   }
                   setExpandedDocs(!expandedDocs);
                 }}
-                className="flex items-center text-indigo-900 font-semibold cursor-pointer select-none"
+                className="flex items-center text-secondary-foreground font-semibold cursor-pointer select-none"
                 aria-expanded={expandedDocs ? "true" : "false"}
               >
                 {expandedDocs ? (
@@ -246,7 +283,7 @@ const PresentationRow = (props: PresentationRowProps) => {
                   }
                   setExpandedDetail(!expandedDetail);
                 }}
-                className="flex items-center text-indigo-900 font-semibold cursor-pointer select-none"
+                className="flex items-center text-secondary-foreground font-semibold cursor-pointer select-none"
                 aria-expanded={expandedDetail ? "true" : "false"}
               >
                 {expandedDetail ? (
@@ -297,16 +334,15 @@ const PresentationRow = (props: PresentationRowProps) => {
                   <div className="space-y-4">
                     {scheduleItem.documents.map((doc, idx) => {
                       const sizeKB = (Number(doc.size) / 1024).toFixed(1);
-                      const fileUrl = `${doc.path}`;
                       return (
                         <div
                           key={idx}
-                          className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                          className="flex items-center justify-between bg-secondary/60 border rounded-lg p-4 hover:bg-secondary transition-colors"
                         >
                           <div className="flex items-center gap-4">
                             {getFileIcon(doc.type)}
                             <div>
-                              <p className="font-medium text-gray-800">
+                              <p className="font-medium text-secondary-foreground">
                                 {doc.name}
                               </p>
                               <p className="text-xs text-gray-500">
@@ -318,16 +354,31 @@ const PresentationRow = (props: PresentationRowProps) => {
                             <span className="text-xs text-gray-500">
                               {sizeKB} KB
                             </span>
-                            <a
-                              href={fileUrl}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:text-indigo-600"
-                              aria-label={`Download ${doc.name}`}
-                            >
-                              <Download className="w-5 h-5" />
-                            </a>
+                            <div className="flex gap-x-3">
+                              <Download
+                                onClick={() =>
+                                  start({
+                                    id: crypto.randomUUID(),
+                                    filename: doc.name,
+                                    url: `media/private`,
+                                    params: { path: doc.path },
+                                  })
+                                }
+                                className="w-5 h-5"
+                              />
+                              <Eye
+                                onClick={() =>
+                                  start({
+                                    id: crypto.randomUUID(),
+                                    filename: doc.name,
+                                    url: `media/private`,
+                                    params: { path: doc.path },
+                                    newTab: true,
+                                  })
+                                }
+                                className="w-5 h-5"
+                              />
+                            </div>
                           </div>
                         </div>
                       );
@@ -363,6 +414,7 @@ const PresentationRow = (props: PresentationRowProps) => {
                   placeHolder={t("select_a")}
                   apiUrl={"statuses/prensentation"}
                   mode="single"
+                  readonly={readonly}
                 />
                 <CustomTextarea
                   required={true}
@@ -381,6 +433,7 @@ const PresentationRow = (props: PresentationRowProps) => {
                     );
                   }}
                   rows={8}
+                  readOnly={readonly}
                 />
               </>
             )}

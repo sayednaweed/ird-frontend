@@ -192,3 +192,9 @@ export const ApplicationEnum = {
   user_approval: 1,
   organization_registeration_valid_time: 2,
 };
+export const ScheduleStatusEnum = {
+  Scheduled: 1,
+  Cancelled: 2,
+  Postponed: 3,
+  Completed: 4,
+};

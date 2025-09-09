@@ -20,6 +20,7 @@ import {
 } from "@/components/custom-ui/breadcrumb/Breadcrumb";
 import { NormalProject } from "@/views/pages/auth-features/schedules/tabs/normal-project";
 import { UrgentProject } from "@/views/pages/auth-features/schedules/tabs/urgent-project";
+import { ScheduleStatusEnum } from "@/database/model-enums";
 
 export default function AddOrEditSchedule() {
   const { t, i18n } = useTranslation();
@@ -95,6 +96,8 @@ export default function AddOrEditSchedule() {
     try {
     } catch (error: any) {}
   };
+  const isPending =
+    schedule?.schedule_status_id == ScheduleStatusEnum.Scheduled;
   return (
     <div className="px-2 pt-2 pb-12 flex flex-col gap-y-[2px] relative select-none rtl:text-2xl-rtl ltr:text-xl-ltr">
       <Breadcrumb>
@@ -120,16 +123,18 @@ export default function AddOrEditSchedule() {
                   }
                   className="items-center border bg-primary/5 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-primary/10"
                 >
-                  {t("start_resentation")}
+                  {t(isPending ? "start_resentation" : "view")}
                   <PlaneTakeoff />
                 </PrimaryButton>
-                <PrimaryButton
-                  onClick={cancel}
-                  className="items-center border bg-red-400/20 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-red-400/70"
-                >
-                  {t("cancel")}
-                  <SquareX />
-                </PrimaryButton>
+                {isPending && (
+                  <PrimaryButton
+                    onClick={cancel}
+                    className="items-center border bg-red-400/20 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-red-400/70"
+                  >
+                    {t("cancel")}
+                    <SquareX />
+                  </PrimaryButton>
+                )}
               </>
             )}
           </div>

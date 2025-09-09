@@ -25,7 +25,7 @@ import EditRepresentativeTab from "./steps/edit-representative-tab";
 import UploadRegisterFormDailog from "./parts/upload-register-form-Dailog";
 import EditAgreementStatusTab from "./steps/edit-agreement-status-tab";
 import { useGeneralAuthState } from "@/stores/auth/use-auth-store";
-import { PermissionEnum, StatusEnum } from "@/database/model-enums";
+import { PermissionEnum, RoleEnum, StatusEnum } from "@/database/model-enums";
 import { toast } from "sonner";
 import type { UserPermission } from "@/database/models";
 import {
@@ -228,59 +228,61 @@ export default function OrganizationEditPage() {
                   </h1>
                 </IconButton>
               )}
-              {userData.organizationInformation.status_id ==
-                StatusEnum.document_upload_required && (
-                <>
-                  <NastranModel
-                    size="md"
-                    isDismissable={false}
-                    button={
-                      <IconButton className="hover:bg-primary/5 gap-x-4 grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] mx-auto transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2">
-                        <CloudUpload
-                          className={`size-[18px] pointer-events-none justify-self-end`}
-                        />
-                        <h1
-                          className={`rtl:text-lg-rtl ltr:text-xl-ltr justify-self-start text-start font-semibold`}
-                        >
-                          {t("up_register_fo")}
-                        </h1>
-                      </IconButton>
-                    }
-                    showDialog={async () => true}
-                  >
-                    <UploadRegisterFormDailog
-                      onComplete={() => {
-                        const organizationInformation =
-                          userData.organizationInformation;
-                        organizationInformation.status_id = StatusEnum.pending;
-                        setUserData({
-                          ...userData,
-                          organizationInformation: organizationInformation,
-                        });
-                      }}
-                    />
-                  </NastranModel>
-                  <IconButton
-                    onClick={() =>
-                      start({
-                        id: generateUUID(),
-                        filename: `${userData.organizationInformation.name}.zip`,
-                        url: `organization/generate/registeration/${id}`,
-                      })
-                    }
-                    className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2"
-                  >
-                    <CloudDownload
-                      className={`size-[18px] pointer-events-none justify-self-end`}
-                    />
-                    <h1
-                      className={`rtl:text-lg-rtl ltr:text-xl-ltr font-semibold justify-self-start`}
+              {user.role.role == RoleEnum.organization &&
+                userData.organizationInformation.status_id ==
+                  StatusEnum.document_upload_required && (
+                  <>
+                    <NastranModel
+                      size="md"
+                      isDismissable={false}
+                      button={
+                        <IconButton className="hover:bg-primary/5 gap-x-4 grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] mx-auto transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2">
+                          <CloudUpload
+                            className={`size-[18px] pointer-events-none justify-self-end`}
+                          />
+                          <h1
+                            className={`rtl:text-lg-rtl ltr:text-xl-ltr justify-self-start text-start font-semibold`}
+                          >
+                            {t("up_register_fo")}
+                          </h1>
+                        </IconButton>
+                      }
+                      showDialog={async () => true}
                     >
-                      {t("download_r_form")}
-                    </h1>
-                  </IconButton>
-                </>
-              )}
+                      <UploadRegisterFormDailog
+                        onComplete={() => {
+                          const organizationInformation =
+                            userData.organizationInformation;
+                          organizationInformation.status_id =
+                            StatusEnum.pending;
+                          setUserData({
+                            ...userData,
+                            organizationInformation: organizationInformation,
+                          });
+                        }}
+                      />
+                    </NastranModel>
+                    <IconButton
+                      onClick={() =>
+                        start({
+                          id: generateUUID(),
+                          filename: `${user.username}.zip`,
+                          url: `organization/generate/registeration/${id}`,
+                        })
+                      }
+                      className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2"
+                    >
+                      <CloudDownload
+                        className={`size-[18px] pointer-events-none justify-self-end`}
+                      />
+                      <h1
+                        className={`rtl:text-lg-rtl ltr:text-xl-ltr font-semibold justify-self-start`}
+                      >
+                        {t("download_r_form")}
+                      </h1>
+                    </IconButton>
+                  </>
+                )}
             </TabsList>
             <TabsContent
               className="flex-1 m-0"

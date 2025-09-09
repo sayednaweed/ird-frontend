@@ -20,6 +20,7 @@ export interface DownloadItem {
   id: string;
   filename: string;
   params?: any;
+  newTab?: boolean;
   url: string;
   progress: number;
   status: Status;
@@ -206,16 +207,31 @@ export const useDownloadStore = create<State>()(
             }
           }
 
-          const blob = new Blob(chunks);
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = blobUrl;
-          a.download = next.filename;
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
+          if (next.newTab) {
+            const contentType =
+              response.headers.get("Content-Type") ||
+              "application/octet-stream";
+            const blob = new Blob(chunks, { type: contentType });
+            const blobUrl = URL.createObjectURL(blob);
+
+            // Try opening in a new tab
+            window.open(blobUrl, "_blank");
+
+            // Revoke after delay to release memory
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+          } else {
+            const blob = new Blob(chunks);
+
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = blobUrl;
+            a.download = next.filename;
+            a.style.display = "none";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+          }
 
           await removeNativeItem("download_chunks_db", "chunks", next.id);
 

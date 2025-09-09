@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import UploadButton from "@rpldy/upload-button";
 import ChunkedUploady from "@rpldy/chunked-uploady";
 import SimpleProgressBar from "./SimpleProgressBar";
-import { cn, isFile } from "@/lib/utils";
+import { cn, generateUUID, isFile } from "@/lib/utils";
 import type { FileType } from "@/lib/types";
 import { useDownloadStore } from "@/components/custom-ui/download-manager/download-store";
 export interface CheckListProps
@@ -76,7 +76,7 @@ const CheckListChooser = React.forwardRef<HTMLInputElement, CheckListProps>(
                 <label
                   onClick={() => {
                     start({
-                      id: crypto.randomUUID(),
+                      id: generateUUID(),
                       filename: defaultFile.name,
                       url: donwloadUrl,
                       params: { path: defaultFile.path },
