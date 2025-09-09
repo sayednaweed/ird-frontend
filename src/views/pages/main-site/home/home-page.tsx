@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth/auth-store";
+import { Building2, DollarSign, CalendarRange, BadgeCheck, Mail, Phone, Building } from "lucide-react";
 
 interface NewsListItem {
   id: number;
@@ -72,16 +73,16 @@ export default function HomePage() {
         url === "news"
           ? "news/public"
           : url === "featured-news"
-          ? "news/public?featured=1"
-          : url === "organizations" || url === "featured-organizations"
-          ? "organizations/public"
-          : url === "donors" || url === "featured-donors"
-          ? "donors"
-          : url === "projects" || url === "featured-projects"
-          ? url === "featured-projects" 
-            ? "projects/public?featured=1"
-            : "projects/public"
-          : url;
+            ? "news/public?featured=1"
+            : url === "organizations" || url === "featured-organizations"
+              ? "organizations/public"
+              : url === "donors" || url === "featured-donors"
+                ? "donors"
+                : url === "projects" || url === "featured-projects"
+                  ? url === "featured-projects"
+                    ? "projects/public?featured=1"
+                    : "projects/public"
+                  : url;
 
       const cached = newsCache[url as keyof typeof newsCache];
       if (cached) {
@@ -274,11 +275,7 @@ export default function HomePage() {
             {
               name: "Donors",
               url: "donors",
-            },
-            {
-              name: "Featured Donors",
-              url: "featured-donors",
-            },
+            }
           ]}
           shimmer={
             <>
@@ -291,22 +288,36 @@ export default function HomePage() {
           {(data) => (
             <Card
               key={data.id}
-              className="m-0 p-0 w-full rounded-md shadow relative min-h-[220px] gap-y-3 hover:-translate-y-1 transition-transform duration-300 ease-out"
+              className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[220px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center rounded-full bg-primary/10 text-primary font-semibold w-14 h-14">
+              {/* Header */}
+              <CardContent className="p-6 pb-3">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="flex items-center justify-center rounded-full bg-black text-white  font-semibold w-12 h-12 ">
                     {(data.abbr || data.name || data.username || "").substring(0, 2).toUpperCase()}
                   </div>
-                  <div className="flex flex-col">
-                    <h3 className="font-bold text-xl line-clamp-1">{data.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-1">{data.email}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Building className="w-6 h-6 text-slate-500 shrink-0 bg-orange-500 rounded-md p-1 text-white" />
+                      <h3 className="font-semibold text-slate-900 tracking-tight line-clamp-1">{data.name}</h3>
+                    </div>
+                    <div className="flex items-center gap-2 text-[13px] text-slate-600 min-w-0">
+                      <Mail className="w-6 h-6 text-slate-500 shrink-0 bg-blue-400 rounded-md p-1 text-white mt-1" />
+                      <span className="truncate">{data.email}</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex items-center justify-between px-6 pb-6">
-                <span className="text-sm text-muted-foreground line-clamp-1">{t("Contact")}: {data.contact}</span>
-                <span className="text-xs rounded-full bg-blue-50 text-blue-700 px-3 py-1">{data.username}</span>
+
+              {/* Footer */}
+              <CardFooter className="flex items-center justify-between px-6 pb-5 pt-0 border-t border-slate-100">
+                <span className="flex items-center gap-2 text-[13px] text-slate-600">
+                  <Phone className="w-6 h-6 text-slate-500 shrink-0 bg-green-500 rounded-md p-1 text-white mt-1" />
+                  <span className="truncate">{data.contact}</span>
+                </span>
+                <span className="text-[12px] text-slate-300 line-clamp-1 bg-slate-800 rounded-full p-1">
+                  Since: {new Date(data.created_at).toLocaleDateString()}
+                </span>
               </CardFooter>
             </Card>
           )}
@@ -350,24 +361,57 @@ export default function HomePage() {
           }
         >
           {(data) => (
-            <Card
-              key={data.id}
-              className="m-0 p-0 w-full rounded-md shadow relative min-h-[220px] gap-y-3 hover:-translate-y-1 transition-transform duration-300 ease-out"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <h3 className="font-bold text-xl line-clamp-1">{data.project_name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-1">{t("Donor")}: {data.donor}</p>
-                  </div>
-                  <span className="text-xs rounded-full bg-amber-50 text-amber-700 px-3 py-1">{data.status}</span>
-                </div>
-              </CardContent>
-              <CardFooter className="flex items-center justify-between px-6 pb-6">
-                <span className="text-sm text-muted-foreground line-clamp-1">{t("Budget")}: {data.budget} {data.currency}</span>
-                <span className="text-xs text-muted-foreground line-clamp-1">{data.start_date} → {data.end_date}</span>
-              </CardFooter>
-            </Card>
+           <Card
+           key={data.id}
+           className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[240px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1"
+         >
+           {/* Top gradient strip (20%) */}
+           <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-slate-800 to-slate-600 rounded-t-2xl" />
+         
+           {/* Decorative subtle background pattern */}
+           <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(45rem_20rem_at_120%_10%,_#94a3b8_15%,transparent_40%),radial-gradient(30rem_18rem_at_-10%_-10%,_#64748b_10%,transparent_40%)]" />
+         
+           {/* Hover glow accent */}
+           <div className="pointer-events-none absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-40 transition duration-300 bg-[radial-gradient(40rem_18rem_at_50%_-10%,theme(colors.slate.400/20),transparent_60%)]" />
+         
+           <CardContent className="relative z-10 p-6">
+             <div className="flex items-start justify-between gap-3">
+               <div className="flex flex-col space-y-1 min-w-0">
+                 <h3 className="font-semibold text-lg text-slate-900 tracking-tight line-clamp-1 group-hover:text-slate-800">
+                   {data.project_name}
+                 </h3>
+                 <div className="flex items-center gap-2 text-[13px] text-slate-600 min-w-0">
+                   <Building2 className="w-4 h-4 text-slate-500 shrink-0" />
+                   <span className="truncate">{t("Donor")}: {data.donor}</span>
+                 </div>
+               </div>
+               <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-amber-300/70 bg-amber-50/90 text-amber-700 px-3 py-1 text-[11px] font-medium shadow-sm backdrop-blur-sm">
+                 <BadgeCheck className="w-4 h-4" />
+                 {data.status}
+               </span>
+             </div>
+           </CardContent>
+         
+           <CardFooter className="relative z-10 flex items-center justify-between px-6 pb-6 pt-0 border-t border-slate-100">
+             <span className="flex items-center gap-2 text-[13px] text-slate-700 min-w-0">
+               <DollarSign className="w-4 h-4 text-slate-500 shrink-0" />
+               <span className="truncate">
+                 {t("Budget")}:{" "}
+                 <span className="font-semibold text-slate-800">
+                   {data.budget} {data.currency}
+                 </span>
+               </span>
+             </span>
+             <span className="flex items-center gap-2 text-[12px] text-slate-500">
+               <CalendarRange className="w-4 h-4 shrink-0" />
+               <span className="truncate">{data.start_date} → {data.end_date}</span>
+             </span>
+           </CardFooter>
+         
+           {/* Bottom glowing accent line */}
+           <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-slate-400/50 to-transparent opacity-80" />
+         </Card>
+         
           )}
         </HomeSection>
       </section>
