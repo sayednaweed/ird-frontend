@@ -76,7 +76,7 @@ export default function HomePage() {
               ? "organizations/latest"
               : url === "featured-organizations"
                 ? "organizations/topprojects"
-                : url === "donors" || url === "featured-donors"
+                : url === "donors"
                   ? "donors"
                   : url === "projects" || url === "featured-projects"
                     ? url === "featured-projects"
