@@ -71,8 +71,9 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
 `;
   const onTabClick = async (tab: string, url: string) => {
     const data = await fetch(tab, url);
+    console.debug("HomeSection fetch", { tab, url, failed: data.failed, count: Array.isArray(data.data) ? data.data.length : null });
     setList(data.data);
-    if (data.failed) setFaild(true);
+    setFaild(!!data.failed);
     setTab(tab);
   };
 
@@ -100,7 +101,16 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
         msOverflowStyle: "none", // IE 10+
       }}
     >
-      {list && (renderAll ? renderAll(list) : list.map((data: T) => children(data)))}
+      {list && list.length === 0 ? (
+        <div className="col-span-full text-sm text-muted-foreground py-6 text-center">
+          No items to display.
+        </div>
+      ) : list &&
+        (renderAll
+          ? renderAll(list)
+          : list.map((data: T, index: number) => (
+              <div key={index}>{children(data)}</div>
+            )))}
     </TabsContent>
   ));
   return (

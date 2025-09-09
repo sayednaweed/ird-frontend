@@ -6,6 +6,9 @@ const socket = io(URL, {
   autoConnect: false,
   withCredentials: true, // ✅ SEND cookies like `access_token`
   secure: false, // ✅ false in localhost, true only in production HTTPS
+  reconnection: false, // Avoid repeated retries if server is down
+  timeout: 3000, // Fail fast in dev
+  transports: ["websocket"], // Prefer WS to avoid polling noise
 });
 
 export default socket;

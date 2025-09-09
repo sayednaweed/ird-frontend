@@ -29,11 +29,8 @@ interface NewsListItem {
 
 interface OrganizationListItem {
   id: number;
-  abbr: string | null;
-  status: string;
   name: string;
-  type: string;
-  director: string;
+  logo?: string | null;
 }
 
 interface DonorListItem {
@@ -72,41 +69,68 @@ export default function HomePage() {
     try {
       const endpoint =
         url === "news"
-          ? "news/public"
+          ? "newses/latest"
           : url === "featured-news"
-            ? "news/public?featured=1"
-            : url === "organizations" || url === "featured-organizations"
-              ? "organizations/public"
-              : url === "donors" || url === "featured-donors"
-                ? "donors"
-                : url === "projects" || url === "featured-projects"
-                  ? url === "featured-projects"
-                    ? "projects/public?featured=1"
-                    : "projects/public"
-                  : url;
+            ? "newses/high"
+            : url === "organizations"
+              ? "organizations/latest"
+              : url === "featured-organizations"
+                ? "organizations/topprojects"
+                : url === "donors" || url === "featured-donors"
+                  ? "donors"
+                  : url === "projects" || url === "featured-projects"
+                    ? url === "featured-projects"
+                      ? "projects/public?featured=1"
+                      : "projects/public"
+                    : url;
 
       const cached = newsCache[url as keyof typeof newsCache];
       if (cached) {
         return { failed: false, data: cached };
       }
       const token = useAuthStore.getState().token;
-      const isOrg = endpoint.startsWith("organizations/public");
+      const isOrg = endpoint.startsWith("organizations/");
       const isDonor = endpoint === "donors";
       const isProject = endpoint.startsWith("projects/public");
-      const params = isOrg || isDonor || isProject ? { per_page: 12, page: 1 } : { _limit: 12, _page: 1 };
+      const isNewsPublic =
+        endpoint === "news/public" ||
+        endpoint.startsWith("newses/high") ||
+        endpoint.startsWith("newses/latest");
+      const params = isOrg
+        ? {}
+        : isProject
+          ? {}
+          : isDonor
+            ? { per_page: 12, page: 1 }
+            : (isNewsPublic ? {} : { _limit: 12, _page: 1 });
       const response = await axiosClient.get(endpoint, {
         params,
-        withCredentials: isOrg || isProject ? false : axiosClient.defaults.withCredentials,
+        withCredentials: isOrg || isProject || isNewsPublic ? false : axiosClient.defaults.withCredentials,
         headers: {
-          ...(token && !isOrg && !isProject ? { Authorization: `Bearer ${token}` } : {}),
+          'Accept-Language': i18n.language,
+          ...(token && !isOrg && !isProject && !isNewsPublic ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
       if (response.status === 200) {
         if (isOrg) {
-          const list: any[] = response.data?.organizations?.data ?? [];
-          setNewsCache((s) => ({ ...s, [url]: list }));
-          return { failed: false, data: list };
+          let list: any[] = response.data?.data?.organizations ?? [];
+          if (Array.isArray(list) && list.length === 0 && i18n.language !== 'en') {
+            const retry = await axiosClient.get(endpoint, {
+              // Do not send pagination params on news endpoints during retry
+              params: {},
+              withCredentials: false,
+              headers: { 'Accept-Language': 'en' },
+            });
+            list = retry.data?.data?.organizations ?? [];
+          }
+          const mapped: OrganizationListItem[] = list.map((o: any) => ({
+            id: typeof o.id === 'number' ? o.id : 0,
+            name: o.name ?? '',
+            logo: o.logo ?? null,
+          }));
+          setNewsCache((s) => ({ ...s, [url]: mapped }));
+          return { failed: false, data: mapped };
         } else if (isDonor) {
           const list: any[] = response.data?.donor?.data ?? [];
           setNewsCache((s) => ({ ...s, [url]: list }));
@@ -115,6 +139,49 @@ export default function HomePage() {
           const list: any[] = response.data?.projects?.data ?? [];
           setNewsCache((s) => ({ ...s, [url]: list }));
           return { failed: false, data: list };
+        } else if (response.data?.newses && Array.isArray(response.data.newses)) {
+          let list: any[] = Array.isArray(response.data.newses)
+            ? (response.data.newses as any[])
+            : Array.isArray((response.data as any)?.newses?.data)
+              ? (response.data as any).newses.data
+              : [];
+          if (list.length === 0 && i18n.language !== 'en') {
+            // retry with English as a safe fallback
+            const retry = await axiosClient.get(endpoint, {
+              // Do not send pagination params on news endpoints during retry
+              params: {},
+              withCredentials: false,
+              headers: { 'Accept-Language': 'en' },
+            });
+            list = Array.isArray(retry.data?.newses)
+              ? retry.data.newses
+              : Array.isArray(retry.data?.newses?.data)
+                ? retry.data.newses.data
+                : [];
+          }
+          const mapped: NewsListItem[] = (list as any[]).map((n: any, idx: number) => {
+            const priorityId = typeof n.priority === 'number' ? n.priority : 0;
+            const priorityLabel = typeof n.priority === 'number'
+              ? (n.priority === 1 ? 'High' : n.priority === 2 ? 'Medium' : n.priority === 3 ? 'Low' : String(n.priority))
+              : (n.priority ?? '');
+            return {
+              // Provide a stable fallback id to avoid duplicate keys when backend omits id
+              id: typeof n.id === 'number' ? n.id : 100000 + idx,
+              visible: true,
+              date: null,
+              visibility_date: null,
+              news_type_id: 0,
+              news_type: '',
+              priority_id: priorityId,
+              priority: priorityLabel,
+              title: n.title,
+              contents: n.contents,
+              image: n.image ?? null,
+              created_at: '',
+            } as NewsListItem;
+          });
+          setNewsCache((s) => ({ ...s, [url]: mapped }));
+          return { failed: false, data: mapped };
         } else if (Array.isArray(response.data)) {
           const normalized: NewsListItem[] = response.data.map((n: any) => ({
             ...n,
@@ -232,23 +299,26 @@ export default function HomePage() {
           {(data) => (
             <Card
               key={data.id}
-              className="m-0 p-0 w-full rounded-md shadow relative min-h-[260px] gap-y-3 hover:-translate-y-1 transition-transform duration-300 ease-out"
+              className="m-0 p-0 w-full rounded-md shadow relative min-h-[220px] gap-y-3 hover:-translate-y-1 transition-transform duration-300 ease-out"
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center rounded-full bg-primary/10 text-primary font-semibold w-14 h-14">
-                    {(data.abbr || data.name || "").substring(0, 2).toUpperCase()}
+                  <div className="flex items-center justify-center rounded-full bg-primary/5 text-primary font-semibold w-16 h-16 overflow-hidden">
+                    {data.logo ? (
+                      <img
+                        src={`${(import.meta as any).env?.VITE_API_BASE_URL?.replace(/\/+$/, "")}/${String(data.logo).replace(/^\/+/, "")}`}
+                        alt={data.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{(data.name || "").substring(0, 2).toUpperCase()}</span>
+                    )}
                   </div>
                   <div className="flex flex-col">
                     <h3 className="font-bold text-xl line-clamp-1">{data.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-1">{data.type}</p>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex items-center justify-between px-6 pb-6">
-                <span className="text-sm text-muted-foreground line-clamp-1">{t("Director")}: {data.director}</span>
-                <span className="text-xs rounded-full bg-emerald-50 text-emerald-700 px-3 py-1">{data.status}</span>
-              </CardFooter>
             </Card>
           )}
         </HomeSection>
@@ -329,57 +399,57 @@ export default function HomePage() {
           }
         >
           {(data) => (
-           <Card
-           key={data.id}
-           className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[240px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1"
-         >
-           {/* Top gradient strip (20%) */}
-           <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-slate-800 to-slate-600 rounded-t-2xl" />
-         
-           {/* Decorative subtle background pattern */}
-           <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(45rem_20rem_at_120%_10%,_#94a3b8_15%,transparent_40%),radial-gradient(30rem_18rem_at_-10%_-10%,_#64748b_10%,transparent_40%)]" />
-         
-           {/* Hover glow accent */}
-           <div className="pointer-events-none absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-40 transition duration-300 bg-[radial-gradient(40rem_18rem_at_50%_-10%,theme(colors.slate.400/20),transparent_60%)]" />
-         
-           <CardContent className="relative z-10 p-6">
-             <div className="flex items-start justify-between gap-3">
-               <div className="flex flex-col space-y-1 min-w-0">
-                 <h3 className="font-semibold text-lg text-slate-900 tracking-tight line-clamp-1 group-hover:text-slate-800">
-                   {data.project_name}
-                 </h3>
-                 <div className="flex items-center gap-2 text-[13px] text-slate-600 min-w-0">
-                   <Building2 className="w-4 h-4 text-slate-500 shrink-0" />
-                   <span className="truncate">{t("Donor")}: {data.donor}</span>
-                 </div>
-               </div>
-               <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-amber-300/70 bg-amber-50/90 text-amber-700 px-3 py-1 text-[11px] font-medium shadow-sm backdrop-blur-sm">
-                 <BadgeCheck className="w-4 h-4" />
-                 {data.status}
-               </span>
-             </div>
-           </CardContent>
-         
-           <CardFooter className="relative z-10 flex items-center justify-between px-6 pb-6 pt-0 border-t border-slate-100">
-             <span className="flex items-center gap-2 text-[13px] text-slate-700 min-w-0">
-               <DollarSign className="w-4 h-4 text-slate-500 shrink-0" />
-               <span className="truncate">
-                 {t("Budget")}:{" "}
-                 <span className="font-semibold text-slate-800">
-                   {data.budget} {data.currency}
-                 </span>
-               </span>
-             </span>
-             <span className="flex items-center gap-2 text-[12px] text-slate-500">
-               <CalendarRange className="w-4 h-4 shrink-0" />
-               <span className="truncate">{data.start_date} → {data.end_date}</span>
-             </span>
-           </CardFooter>
-         
-           {/* Bottom glowing accent line */}
-           <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-slate-400/50 to-transparent opacity-80" />
-         </Card>
-         
+            <Card
+              key={data.id}
+              className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[240px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1"
+            >
+              {/* Top gradient strip (20%) */}
+              <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-slate-800 to-slate-600 rounded-t-2xl" />
+
+              {/* Decorative subtle background pattern */}
+              <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(45rem_20rem_at_120%_10%,_#94a3b8_15%,transparent_40%),radial-gradient(30rem_18rem_at_-10%_-10%,_#64748b_10%,transparent_40%)]" />
+
+              {/* Hover glow accent */}
+              <div className="pointer-events-none absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-40 transition duration-300 bg-[radial-gradient(40rem_18rem_at_50%_-10%,theme(colors.slate.400/20),transparent_60%)]" />
+
+              <CardContent className="relative z-10 p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col space-y-1 min-w-0">
+                    <h3 className="font-semibold text-lg text-slate-900 tracking-tight line-clamp-1 group-hover:text-slate-800">
+                      {data.project_name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-[13px] text-slate-600 min-w-0">
+                      <Building2 className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="truncate">{t("Donor")}: {data.donor}</span>
+                    </div>
+                  </div>
+                  <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-amber-300/70 bg-amber-50/90 text-amber-700 px-3 py-1 text-[11px] font-medium shadow-sm backdrop-blur-sm">
+                    <BadgeCheck className="w-4 h-4" />
+                    {data.status}
+                  </span>
+                </div>
+              </CardContent>
+
+              <CardFooter className="relative z-10 flex items-center justify-between px-6 pb-6 pt-0 border-t border-slate-100">
+                <span className="flex items-center gap-2 text-[13px] text-slate-700 min-w-0">
+                  <DollarSign className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span className="truncate">
+                    {t("Budget")}:{" "}
+                    <span className="font-semibold text-slate-800">
+                      {data.budget} {data.currency}
+                    </span>
+                  </span>
+                </span>
+                <span className="flex items-center gap-2 text-[12px] text-slate-500">
+                  <CalendarRange className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{data.start_date} → {data.end_date}</span>
+                </span>
+              </CardFooter>
+
+              {/* Bottom glowing accent line */}
+              <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-slate-400/50 to-transparent opacity-80" />
+            </Card>
+
           )}
         </HomeSection>
       </section>

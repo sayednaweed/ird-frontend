@@ -66,13 +66,17 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
 
         <div className="flex items-center justify-between">
         
-          <Link
-            to={`/news/${news.id}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-800 rounded-full px-2 py-1 hover:text-slate-200 hover:underline"
-          >
-            <Book className="w-3 h-3" />
-            Read more
-          </Link>
+          {news.id ? (
+            <Link
+              to={`/news/${news.id}`}
+              className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-800 rounded-full px-2 py-1 hover:text-slate-200 hover:underline"
+            >
+              <Book className="w-3 h-3" />
+              Read more
+            </Link>
+          ) : (
+            <span className="text-xs text-muted-foreground">Latest update</span>
+          )}
         </div>
       </div>
     </animated.div>
