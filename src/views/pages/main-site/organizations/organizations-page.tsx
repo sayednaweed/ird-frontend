@@ -12,6 +12,7 @@ interface OrganizationListItem {
   name: string;
   type: string;
   director: string;
+  logo?: string | null;
 }
 
 export default function OrganizationsPage() {
@@ -25,21 +26,22 @@ export default function OrganizationsPage() {
         {/* Artistic background layers (scoped) */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(40rem_18rem_at_120%_10%,_#fdba74_18%,transparent_45%),radial-gradient(28rem_16rem_at_-10%_-10%,_#f59e0b_14%,transparent_45%)]" />
         <div className="p-5 flex items-center gap-4 relative z-10">
-          <div className="flex items-center justify-center rounded-full bg-white text-primary font-semibold w-14 h-14 ring-1 ring-slate-200">
-            {initials}
+          <div className="flex items-center justify-center rounded-full bg-white text-primary font-semibold w-16 h-16 overflow-hidden ring-1 ring-slate-200">
+            {o.logo ? (
+              <img
+                src={`${(import.meta as any).env?.VITE_API_BASE_URL?.replace(/\/+$/, "")}/${String(o.logo).replace(/^\/+/, "")}`}
+                alt={o.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>{initials}</span>
+            )}
           </div>
           <div className="min-w-0">
-            <h3 className="text-base font-semibold tracking-tight text-primary line-clamp-1">
+            <h3 className="text-base font-semibold tracking-tight text-slate-900 line-clamp-1">
               {o.name}
             </h3>
-            <p className="text-xs text-muted-foreground line-clamp-1">{o.type}</p>
           </div>
-          <span className="ml-auto shrink-0 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-medium shadow-sm">
-            {o.status}
-          </span>
-        </div>
-        <div className="px-5 pb-5 text-xs text-muted-foreground relative z-10">
-          {t("Director")}: {o.director}
         </div>
       </div>
     );
@@ -59,17 +61,12 @@ export default function OrganizationsPage() {
 
   const shimmer = useMemo(
     () => (
-      <div className="rounded-xl overflow-hidden border bg-card shadow-sm p-4">
+      <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm p-5">
         <div className="flex items-center gap-4">
-          <Shimmer className="w-14 h-14 rounded-full" />
-          <div className="flex-1 space-y-2">
+          <Shimmer className="w-16 h-16 rounded-full" />
+          <div className="flex-1">
             <Shimmer className="h-4 w-2/3 rounded" />
-            <Shimmer className="h-3 w-1/2 rounded" />
           </div>
-          <Shimmer className="h-4 w-16 rounded" />
-        </div>
-        <div className="px-0 pt-3">
-          <Shimmer className="h-3 w-1/3 rounded" />
         </div>
       </div>
     ),
