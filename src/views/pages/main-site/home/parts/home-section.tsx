@@ -114,7 +114,16 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     </TabsContent>
   ));
   return (
-    <div className={cn("grid gap-y-3 group", className)}>
+    <div className={cn("relative overflow-hidden grid gap-y-3 group", className)}>
+      {/* Decorative section background (scoped) */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        {/* Top-right orb */}
+        <div className="absolute -top-10 right-6 h-40 w-40 rounded-full blur-2xl opacity-25 bg-[radial-gradient(closest-side,_rgba(251,146,60,0.5),_transparent_70%)]" />
+        {/* Bottom-left orb */}
+        <div className="absolute -bottom-12 -left-8 h-56 w-56 rounded-full blur-3xl opacity-20 bg-[radial-gradient(closest-side,_rgba(251,191,36,0.45),_transparent_70%)]" />
+        {/* Diagonal ribbon */}
+        <div className="absolute -inset-x-6 top-1/2 -translate-y-1/2 h-16 rotate-[-5deg] opacity-20 bg-gradient-to-r from-orange-200/50 via-orange-100/40 to-transparent dark:from-orange-900/30 dark:via-orange-800/20 dark:to-transparent" />
+      </div>
       {/* Title row */}
       <div className="relative w-full flex items-start gap-3 pb-4">
         {icon && (

@@ -21,9 +21,11 @@ export default function OrganizationsPage() {
   const renderItem = useCallback((o: OrganizationListItem) => {
     const initials = (o.abbr || o.name || "").substring(0, 2).toUpperCase();
     return (
-      <div className="group relative w-full rounded-xl overflow-hidden border bg-card shadow-sm hover:shadow-md transition-all duration-300">
-        <div className="p-4 flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full bg-primary/10 text-primary font-semibold w-14 h-14">
+      <div className="group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 ring-1 ring-orange-100/40">
+        {/* Artistic background layers (scoped) */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(40rem_18rem_at_120%_10%,_#fdba74_18%,transparent_45%),radial-gradient(28rem_16rem_at_-10%_-10%,_#f59e0b_14%,transparent_45%)]" />
+        <div className="p-5 flex items-center gap-4 relative z-10">
+          <div className="flex items-center justify-center rounded-full bg-white text-primary font-semibold w-14 h-14 ring-1 ring-slate-200">
             {initials}
           </div>
           <div className="min-w-0">
@@ -32,11 +34,11 @@ export default function OrganizationsPage() {
             </h3>
             <p className="text-xs text-muted-foreground line-clamp-1">{o.type}</p>
           </div>
-          <span className="ml-auto shrink-0 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-medium">
+          <span className="ml-auto shrink-0 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-medium shadow-sm">
             {o.status}
           </span>
         </div>
-        <div className="px-4 pb-4 text-xs text-muted-foreground">
+        <div className="px-5 pb-5 text-xs text-muted-foreground relative z-10">
           {t("Director")}: {o.director}
         </div>
       </div>

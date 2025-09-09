@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth/auth-store";
-import { Building2, DollarSign, CalendarRange, BadgeCheck, Newspaper, Briefcase, Users, Sparkles } from "lucide-react";
+import { Building2, CalendarRange, Newspaper, Briefcase, Users} from "lucide-react";
 
 interface NewsListItem {
   id: number;
@@ -313,11 +313,13 @@ export default function HomePage() {
             {(data) => (
               <Card
                 key={data.id}
-                className="m-0 p-0 w-full rounded-md shadow relative min-h-[220px] gap-y-3 hover:-translate-y-1 transition-transform duration-300 ease-out"
+                className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[200px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1 ring-1 ring-orange-100/40"
               >
-                <CardContent className="p-6">
+                {/* Artistic background layers (scoped) */}
+                <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(40rem_18rem_at_120%_10%,_#fdba74_18%,transparent_45%),radial-gradient(28rem_16rem_at_-10%_-10%,_#f59e0b_14%,transparent_45%)]" />
+                <CardContent className="relative z-10 p-6">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center rounded-full bg-primary/5 text-primary font-semibold w-16 h-16 overflow-hidden">
+                    <div className="flex items-center justify-center rounded-full bg-white text-primary font-semibold w-16 h-16 overflow-hidden ring-1 ring-slate-200">
                       {data.logo ? (
                         <img
                           src={`${(import.meta as any).env?.VITE_API_BASE_URL?.replace(/\/+$/, "")}/${String(data.logo).replace(/^\/+/, "")}`}
@@ -417,16 +419,13 @@ export default function HomePage() {
             {(data) => (
               <Card
                 key={data.id}
-                className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[240px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1"
+                className="group relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 min-h-[200px] transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1 ring-1 ring-orange-100/40"
               >
-                {/* Top gradient strip (20%) */}
-                <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-slate-800 to-slate-600 rounded-t-2xl" />
-
                 {/* Decorative subtle background pattern */}
-                <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(45rem_20rem_at_120%_10%,_#94a3b8_15%,transparent_40%),radial-gradient(30rem_18rem_at_-10%_-10%,_#64748b_10%,transparent_40%)]" />
+                <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[radial-gradient(45rem_20rem_at_120%_10%,_#fdba74_18%,transparent_40%),radial-gradient(30rem_18rem_at_-10%_-10%,_#f59e0b_14%,transparent_40%)]" />
 
                 {/* Hover glow accent */}
-                <div className="pointer-events-none absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-40 transition duration-300 bg-[radial-gradient(40rem_18rem_at_50%_-10%,theme(colors.slate.400/20),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-40 transition duration-300 bg-[radial-gradient(40rem_18rem_at_50%_-10%,theme(colors.orange.400/20),transparent_60%)]" />
 
                 <CardContent className="relative z-10 p-6">
                   <div className="flex items-start justify-between gap-3">
@@ -439,24 +438,11 @@ export default function HomePage() {
                         <span className="truncate">{t("Donor")}: {data.donor}</span>
                       </div>
                     </div>
-                    <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-amber-300/70 bg-amber-50/90 text-amber-700 px-3 py-1 text-[11px] font-medium shadow-sm backdrop-blur-sm">
-                      <BadgeCheck className="w-4 h-4" />
-                      {data.status}
-                    </span>
                   </div>
                 </CardContent>
 
-                <CardFooter className="relative z-10 flex items-center justify-between px-6 pb-6 pt-0 border-t border-slate-100">
-                  <span className="flex items-center gap-2 text-[13px] text-slate-700 min-w-0">
-                    <DollarSign className="w-4 h-4 text-slate-500 shrink-0" />
-                    <span className="truncate">
-                      {t("Budget")}: {" "}
-                      <span className="font-semibold text-slate-800">
-                        {data.budget} {data.currency}
-                      </span>
-                    </span>
-                  </span>
-                  <span className="flex items-center gap-2 text-[12px] text-slate-500">
+                <CardFooter className="relative z-10 flex items-center justify-end px-6 pb-6 pt-0 border-t border-slate-100">
+                  <span className="flex items-center gap-2 text-[12px] text-slate-600">
                     <CalendarRange className="w-4 h-4 shrink-0" />
                     <span className="truncate">{data.start_date} → {data.end_date}</span>
                   </span>
@@ -465,7 +451,6 @@ export default function HomePage() {
                 {/* Bottom glowing accent line */}
                 <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-slate-400/50 to-transparent opacity-80" />
               </Card>
-
             )}
           </HomeSection>
         </section>

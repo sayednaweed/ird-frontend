@@ -47,8 +47,18 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, delay }) => {
       }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className="group relative w-full rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-[4px] hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+      className="group relative w-full rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-[4px] hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900 ring-1 ring-orange-100/40 dark:ring-orange-900/20"
     >
+      {/* Artistic background layers (scoped to card) */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        {/* Soft grid texture */}
+        <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.06] bg-[linear-gradient(to_right,rgba(100,116,139,0.13)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,116,139,0.13)_1px,transparent_1px)] bg-[size:18px_18px]" />
+        {/* Corner orbs */}
+        <div className="absolute -top-6 -left-6 h-28 w-28 rounded-full blur-2xl opacity-25 bg-[radial-gradient(closest-side,_rgba(251,146,60,0.5),_transparent_70%)]" />
+        <div className="absolute -bottom-10 -right-10 h-36 w-36 rounded-full blur-3xl opacity-20 bg-[radial-gradient(closest-side,_rgba(251,191,36,0.45),_transparent_70%)]" />
+        {/* Diagonal ribbon behind content */}
+        <div className="absolute left-[-10%] right-[-10%] bottom-[18%] h-16 rotate-[-5deg] opacity-15 bg-gradient-to-r from-orange-200/60 via-orange-100/50 to-transparent dark:from-orange-900/35 dark:via-orange-800/25 dark:to-transparent" />
+      </div>
       {/* Top gradient accent */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-300 opacity-90" />
 
