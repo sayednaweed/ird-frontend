@@ -58,11 +58,13 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
   const tabStyle = `
   relative inline-flex items-center
   px-3 py-1.5 rounded-full text-[13px] font-semibold
-  text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white
+  text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white
   transition-all duration-200
-  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-slate-400
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-orange-400/50
   data-[state=active]:text-white data-[state=active]:shadow
-  data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-800 data-[state=active]:to-slate-700
+  data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-700 data-[state=active]:to-orange-500
+  after:content-[""] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-transparent
+  data-[state=active]:after:bg-orange-500/90 dark:data-[state=active]:after:bg-orange-400/90
   whitespace-nowrap
 `;
   const onTabClick = async (tab: string, url: string) => {
@@ -113,15 +115,20 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     <div className={cn("grid gap-y-3 group", className)}>
       {/* Title */}
       <div className="relative w-full">
+        {/* Animated subtle grid background */}
+        <div className="pointer-events-none absolute -inset-x-2 -top-6 h-16 opacity-60 [mask-image:radial-gradient(circle_at_center,white,transparent_70%)]">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(100,116,139,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,116,139,0.06)_1px,transparent_1px)] bg-[size:14px_14px]" />
+          <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-orange-400/10 to-transparent" />
+        </div>
         <h1
-          className="relative z-10 ltr:text-[28px] rtl:text-4xl-rtl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-slate-100 dark:via-slate-300 dark:to-slate-400"
+          className="relative z-10 ltr:text-[28px] rtl:text-4xl-rtl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-700 via-orange-600 to-orange-500 dark:from-orange-400 dark:via-orange-500 dark:to-orange-600"
         >
           {title}
         </h1>
         {/* Decorative underline accent */}
-        <div className="pointer-events-none absolute left-0 top-[90%] h-[3px] w-24 rounded-full bg-gradient-to-r from-violet-500 via-sky-400 to-emerald-400 opacity-90 group-hover:w-36 transition-all duration-500" />
+        <div className="pointer-events-none absolute left-0 top-[90%] h-[3px] w-24 rounded-full bg-gradient-to-r from-orange-700 via-orange-600 to-orange-400 opacity-90 group-hover:w-36 transition-all duration-500" />
         {/* Subtle glow */}
-        <div className="pointer-events-none absolute -inset-x-2 -top-8 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(30rem_10rem_at_10%_0%,theme(colors.violet.400/12),transparent_60%)]" />
+        <div className="pointer-events-none absolute -inset-x-2 -top-8 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(30rem_10rem_at_10%_0%,theme(colors.orange.400/12),transparent_60%)]" />
       </div>
 
       {/* View all link */}
