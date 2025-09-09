@@ -14,6 +14,7 @@ import CustomTextarea from "@/components/custom-ui/textarea/CustomTextarea";
 import { ScheduleStatusEnum, StatusEnum } from "@/database/model-enums";
 import type { Presentation, PresentationItem } from "@/database/models";
 import axiosClient from "@/lib/axois-client";
+import { animated, useSpring } from "@react-spring/web";
 import {
   Check,
   ChevronDown,
@@ -244,6 +245,19 @@ const PresentationRow = (props: PresentationRowProps) => {
       );
     }
   };
+  const docSpring = useSpring({
+    config: { tension: 250, friction: 30 },
+    height: expandedDocs ? "auto" : "0px",
+    opacity: expandedDocs ? 1 : 0,
+    overflow: "hidden",
+  });
+
+  const detailSpring = useSpring({
+    config: { tension: 250, friction: 30 },
+    height: expandedDetail ? "auto" : "0px",
+    opacity: expandedDetail ? 1 : 0,
+    overflow: "hidden",
+  });
   return (
     <div className="space-y-8 mt-1 pb-16">
       {schedule.schedule_items.map((scheduleItem) => (
@@ -322,13 +336,8 @@ const PresentationRow = (props: PresentationRowProps) => {
               </PrimaryButton>
             </div>
           </div>
-
           {/* Documents Section */}
-          <div
-            className={`mt-6 overflow-hidden transition-all duration-300 ${
-              expandedDocs ? "max-h-[1000px]" : "max-h-0"
-            }`}
-          >
+          <animated.div style={docSpring} className="mt-6 overflow-hidden">
             {expandedDocs && (
               <>
                 {scheduleItem.documents.length === 0 ? (
@@ -392,12 +401,10 @@ const PresentationRow = (props: PresentationRowProps) => {
                 )}
               </>
             )}
-          </div>
-          {/* Documents Section */}
-          <div
-            className={`mt-6 py-12 flex flex-col gap-y-4 overflow-hidden transition-all duration-300 ${
-              expandedDetail ? "max-h-[1000px]" : "max-h-0"
-            }`}
+          </animated.div>
+          <animated.div
+            style={detailSpring}
+            className="mt-6 py-6 flex flex-col gap-y-4 overflow-hidden"
           >
             {expandedDetail && (
               <>
@@ -442,7 +449,7 @@ const PresentationRow = (props: PresentationRowProps) => {
                 />
               </>
             )}
-          </div>
+          </animated.div>
         </div>
       ))}
     </div>

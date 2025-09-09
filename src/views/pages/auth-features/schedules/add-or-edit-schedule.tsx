@@ -21,12 +21,16 @@ import {
 import { NormalProject } from "@/views/pages/auth-features/schedules/tabs/normal-project";
 import { UrgentProject } from "@/views/pages/auth-features/schedules/tabs/urgent-project";
 import { ScheduleStatusEnum } from "@/database/model-enums";
+import { toast } from "sonner";
+import ButtonSpinner from "@/components/custom-ui/spinner/ButtonSpinner";
 
 export default function AddOrEditSchedule() {
   const { t, i18n } = useTranslation();
   const [state] = useGlobalState();
   const [tab, setTab] = useState<string>("count");
   const direction = i18n.dir();
+  const [deleting, setDeleting] = useState(false);
+
   const { data, "*": restPath } = useParams();
   const fullDate = restPath ? `${data}/${restPath}` : data;
   const navigate = useNavigate();
@@ -68,15 +72,6 @@ export default function AddOrEditSchedule() {
     } else {
       const response = await axiosClient.get(`schedules/${data}`);
       const sch = response.data;
-      const scheduleDate = new Date(response.data.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      // Also zero out scheduleDate time to compare just the date part
-      scheduleDate.setHours(0, 0, 0, 0);
-
-      if (scheduleDate < today) {
-        sch.passed = true;
-      }
       sch.date = new DateObject(new Date(response.data.date));
       return sch;
     }
@@ -93,9 +88,25 @@ export default function AddOrEditSchedule() {
   const tabStyle =
     "border-0 cursor-pointer data-[state=active]:bg-tertiary/5 data-[state=active]:border-tertiary grow-0 text-muted-foreground transition-colors duration-300 data-[state=active]:font-semibold data-[state=active]:text-primary data-[state=active]:border-b-[2px] h-full rounded-none";
 
-  const cancel = () => {
+  const cancel = async () => {
+    if (deleting || data === undefined) {
+      setDeleting(false);
+      return;
+    }
+    setDeleting(true);
+    // 2. Store
     try {
-    } catch (error: any) {}
+      const response = await axiosClient.delete("schedules/" + data);
+      if (response.status == 200) {
+        toast.success(response.data.message);
+        navigate("/dashboard/schedules", { replace: true });
+      }
+    } catch (error: any) {
+      toast.error(error.response.data?.message);
+      console.log(error);
+    } finally {
+      setDeleting(false);
+    }
   };
   const isPending =
     schedule?.schedule_status_id == ScheduleStatusEnum.Scheduled;
@@ -130,10 +141,14 @@ export default function AddOrEditSchedule() {
                 {isPending && (
                   <PrimaryButton
                     onClick={cancel}
-                    className="items-center border bg-red-400/20 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-red-400/70"
+                    className={`items-center border bg-red-400/20 hover:shadow-none shadow-none text-primary hover:text-primary hover:bg-red-400/70 ${
+                      deleting && "pointer-events-none"
+                    }`}
                   >
-                    {t("cancel")}
-                    <SquareX />
+                    <ButtonSpinner className=" gap-x-2" loading={deleting}>
+                      {t("cancel")}
+                      <SquareX />
+                    </ButtonSpinner>
                   </PrimaryButton>
                 )}
               </>
