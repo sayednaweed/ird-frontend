@@ -144,7 +144,6 @@ export const useDownloadStore = create<State>()(
 
         try {
           const queryString = qs.stringify(next.params, { encode: true });
-          console.log(queryString);
           const url = queryString
             ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/${
                 next.url
