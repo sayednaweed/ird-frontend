@@ -183,7 +183,7 @@ export default function OrganizationEditPage() {
     // 1. Create token
     try {
       const response = await axiosClient.get(
-        `ngo/generate/registeration/${id}`,
+        `organization/generate/registeration/${id}`,
         {
           responseType: "blob", // Important to handle the binary data (PDF)
           onDownloadProgress: (_progressEvent) => {
