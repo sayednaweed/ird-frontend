@@ -76,13 +76,13 @@ export default function HomePage() {
               ? "organizations/latest"
               : url === "featured-organizations"
                 ? "organizations/topprojects"
-                : url === "donors"
+                : url === "donors" || url === "featured-donors"
                   ? "donors"
-                  : url === "projects" || url === "featured-projects"
-                    ? url === "featured-projects"
-                      ? "projects/public?featured=1"
-                      : "projects/public"
-                    : url;
+                  : url === "projects"
+                    ? "projects/public/latest"
+                    : url === "featured-projects"
+                      ? "projects/public/topbudget"
+                      : url;
 
       const cached = newsCache[url as keyof typeof newsCache];
       if (cached) {
