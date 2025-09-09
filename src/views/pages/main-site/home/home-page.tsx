@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth/auth-store";
-import { Building2, DollarSign, CalendarRange, BadgeCheck } from "lucide-react";
+import { Building2, DollarSign, CalendarRange, BadgeCheck, Newspaper, Briefcase, Users, Sparkles } from "lucide-react";
 
 interface NewsListItem {
   id: number;
@@ -76,7 +76,7 @@ export default function HomePage() {
               ? "organizations/latest"
               : url === "featured-organizations"
                 ? "organizations/topprojects"
-                : url === "donors" || url === "featured-donors"
+              : url === "donors" || url === "featured-donors"
                   ? "donors"
                   : url === "projects"
                     ? "projects/public/latest"
@@ -219,6 +219,7 @@ export default function HomePage() {
       <HomeHeader />
       <section>
         <HomeSection<NewsListItem>
+          icon={<Newspaper className="w-5 h-5" />}
           title={t("News")}
           subTitle={t("view_all")}
           subTitleLink={"/news"}
@@ -261,6 +262,7 @@ export default function HomePage() {
       </section>
       <section>
         <HomeSection<OrganizationListItem>
+          icon={<Building2 className="w-5 h-5" />}
           title={t("Organizations")}
           subTitle={t("view_all")}
           subTitleLink={"/organizations"}
@@ -325,6 +327,7 @@ export default function HomePage() {
       </section>
       <section>
         <HomeSection<DonorListItem>
+          icon={<Users className="w-5 h-5" />}
           title={t("Donors")}
           subTitle={t("view_all")}
           subTitleLink={"/donors"}
@@ -363,6 +366,7 @@ export default function HomePage() {
       </section>
       <section>
         <HomeSection<ProjectListItem>
+          icon={<Briefcase className="w-5 h-5" />}
           title={t("Projects")}
           subTitle={t("view_all")}
           subTitleLink={"/projects"}
