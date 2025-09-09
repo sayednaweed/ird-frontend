@@ -56,18 +56,14 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     }
   }, [i18n.language]);
   const tabStyle = `
-  px-4
-  data-[state=active]:border-b-fourth
-  ltr:text-2xl-ltr font-medium rtl:text-xl-rtl
-  data-[state=active]:shadow-none
-  transition-colors
-  data-[state=active]:text-fourth
-  overflow-hidden whitespace-nowrap
-  text-primary
-  data-[state=active]:bg-transparent
-  border-b-[2px]
-  h-full
-  rounded-none
+  relative inline-flex items-center
+  px-3 py-1.5 rounded-full text-[13px] font-semibold
+  text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white
+  transition-all duration-200
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-slate-400
+  data-[state=active]:text-white data-[state=active]:shadow
+  data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-800 data-[state=active]:to-slate-700
+  whitespace-nowrap
 `;
   const onTabClick = async (tab: string, url: string) => {
     const data = await fetch(tab, url);
@@ -114,16 +110,28 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     </TabsContent>
   ));
   return (
-    <div className={cn("grid gap-y-2", className)}>
-      <h1 className=" ltr:text-2xl rtl:text-4xl-rtl font-semibold text-primary">
-        {title}
-      </h1>
+    <div className={cn("grid gap-y-3 group", className)}>
+      {/* Title */}
+      <div className="relative w-full">
+        <h1
+          className="relative z-10 ltr:text-[28px] rtl:text-4xl-rtl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-slate-100 dark:via-slate-300 dark:to-slate-400"
+        >
+          {title}
+        </h1>
+        {/* Decorative underline accent */}
+        <div className="pointer-events-none absolute left-0 top-[90%] h-[3px] w-24 rounded-full bg-gradient-to-r from-violet-500 via-sky-400 to-emerald-400 opacity-90 group-hover:w-36 transition-all duration-500" />
+        {/* Subtle glow */}
+        <div className="pointer-events-none absolute -inset-x-2 -top-8 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(30rem_10rem_at_10%_0%,theme(colors.violet.400/12),transparent_60%)]" />
+      </div>
+
+      {/* View all link */}
       <Link
         to={subTitleLink}
-        className="justify-self-end ltr:text-xl-ltr rtl:text-xl-rtl flex items-center text-fourth gap-x-2 hover:bg-fourth/5 py-1 px-2 rounded-sm transition-all ease-in-out duration-300"
+        className="justify-self-end ltr:text-[14px] rtl:text-xl-rtl inline-flex items-center gap-2 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/70 dark:hover:bg-slate-800 transition-colors shadow-sm ring-1 ring-slate-200/60 dark:ring-slate-700/50"
+        aria-label={subTitle}
       >
-        {subTitle}
-        <ArrowRight className="size-[20px] rtl:rotate-180" />
+        <span className="font-semibold">{subTitle}</span>
+        <ArrowRight className="size-[18px] rtl:rotate-180 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
       </Link>
 
       <Tabs
@@ -137,7 +145,7 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
             msOverflowStyle: "none", // IE 10+
           }}
           className={cn(
-            "border-t gap-x-1 border-primary-foreground/15 overflow-x-auto select-none justify-start p-0 m-0 mb-2 bg-transparent rounded-none",
+            "gap-x-1 overflow-x-auto select-none justify-start p-1 m-0 mb-3 bg-slate-100 dark:bg-slate-900/40 rounded-full ring-1 ring-slate-200/70 dark:ring-slate-800",
             style?.tabList?.className
           )}
         >
