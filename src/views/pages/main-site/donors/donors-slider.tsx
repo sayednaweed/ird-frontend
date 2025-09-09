@@ -33,9 +33,9 @@ export default function TrustedByDonors({ items, speedMs = 1000 }: TrustedByDono
           {duplicated.map((d, idx) => (
             <div
               key={`${d.id}-${idx}`}
-              className="mx-8 h-24 w-56 flex flex-col items-center justify-center opacity-90 hover:opacity-100 transition"
+              className="mx-8 h-24 w-56 flex flex-col items-center justify-center hover:opacity-100 transition"
             >
-              <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-white shadow-sm bg-muted">
+              <div className="w-16 h-16 rounded-full overflow-hidden">
                 <CachedImage
                   src={d.profile ?? undefined}
                   routeIdentifier="profile"
