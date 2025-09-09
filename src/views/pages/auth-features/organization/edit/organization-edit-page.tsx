@@ -39,8 +39,6 @@ import IconButton from "@/components/custom-ui/button/icon-button";
 import type { OrganizationInformation } from "@/lib/types";
 import OrganizationEditHeader from "@/views/pages/auth-features/organization/edit/organization-edit-header";
 import { EditOrganizationPassword } from "@/views/pages/auth-features/organization/edit/steps/edit-organization-password";
-import { useDownloadStore } from "@/components/custom-ui/download-manager/download-store";
-import { generateUUID } from "@/lib/utils";
 
 export interface IOrganizationInformation {
   organizationInformation: OrganizationInformation;
@@ -53,7 +51,6 @@ export default function OrganizationEditPage() {
   const handleGoHome = () => navigate("/dashboard", { replace: true });
   const { t, i18n } = useTranslation();
   let { id } = useParams();
-  const start = useDownloadStore((s) => s.startDownload);
 
   const direction = i18n.dir();
   const [failed, setFailed] = useState(false);
@@ -181,6 +178,40 @@ export default function OrganizationEditPage() {
 
   const registerationExpired: boolean =
     userData?.organizationInformation.status_id == StatusEnum.expired;
+
+  const download = async () => {
+    // 1. Create token
+    try {
+      const response = await axiosClient.get(
+        `ngo/generate/registeration/${id}`,
+        {
+          responseType: "blob", // Important to handle the binary data (PDF)
+          onDownloadProgress: (_progressEvent) => {
+            // Calculate download progress percentage
+          },
+        }
+      );
+      if (response.status == 200) {
+        // Create a URL for the file blob
+        const file = new Blob([response.data], {
+          type: ".zip",
+        });
+        // const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = window.URL.createObjectURL(file);
+
+        const link = document.createElement("a");
+        link.href = fileURL;
+        link.download = "register-form.zip";
+        link.click();
+
+        // Clean up the URL object after download
+        window.URL.revokeObjectURL(fileURL);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+      console.log(error);
+    }
+  };
   return (
     <div className="flex flex-col gap-y-2 px-3 mt-2 pb-12">
       <Breadcrumb>
@@ -263,13 +294,14 @@ export default function OrganizationEditPage() {
                       />
                     </NastranModel>
                     <IconButton
-                      onClick={() =>
-                        start({
-                          id: generateUUID(),
-                          filename: `${user.username}.zip`,
-                          url: `organization/generate/registeration/${id}`,
-                        })
-                      }
+                      // onClick={() =>
+                      //   start({
+                      //     id: generateUUID(),
+                      //     filename: `${user.username}.zip`,
+                      //     url: `organization/generate/registeration/${id}`,
+                      //   })
+                      // }
+                      onClick={download}
                       className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2"
                     >
                       <CloudDownload
