@@ -134,11 +134,13 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
       {/* View all link */}
       <Link
         to={subTitleLink}
-        className="justify-self-end ltr:text-[14px] rtl:text-xl-rtl inline-flex items-center gap-2 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/70 dark:hover:bg-slate-800 transition-colors shadow-sm ring-1 ring-slate-200/60 dark:ring-slate-700/50"
+        className="group/button justify-self-end ltr:text-[14px] rtl:text-xl-rtl inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-white bg-gradient-to-r from-orange-700 to-orange-500 hover:from-orange-600 hover:to-orange-400 transition-all duration-300 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 ring-1 ring-orange-500/50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-400/80"
         aria-label={subTitle}
       >
-        <span className="font-semibold">{subTitle}</span>
+        <span className="font-semibold tracking-tight">{subTitle}</span>
         <ArrowRight className="size-[18px] rtl:rotate-180 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+        {/* Shine overlay */}
+        <span className="pointer-events-none absolute -inset-px rounded-full opacity-0 group-hover/button:opacity-100 transition-opacity duration-300 bg-[radial-gradient(20rem_6rem_at_10%_-30%,rgba(255,255,255,0.25),transparent_60%)]" />
       </Link>
 
       <Tabs
