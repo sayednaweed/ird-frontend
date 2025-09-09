@@ -12,7 +12,11 @@ import {
   UserRound,
   Zap,
 } from "lucide-react";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import NastranModel from "@/components/custom-ui/model/NastranModel";
 
 import ProjectEditHeader from "./project-edit-header";
@@ -167,25 +171,61 @@ export default function ProjectEditPage() {
                   }
                 />
               </NastranModel>
-              <IconButton
-                onClick={() =>
-                  start({
-                    id: generateUUID(),
-                    filename: `${userData.name}.zip`,
-                    url: `projects/unsigned/mou/${id}`,
-                  })
-                }
-                className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2"
-              >
-                <CloudDownload
-                  className={`size-[18px] pointer-events-none justify-self-end`}
-                />
-                <h1
-                  className={`rtl:text-lg-rtl ltr:text-xl-ltr font-semibold justify-self-start`}
-                >
-                  {t("down_mou")}
-                </h1>
-              </IconButton>
+              <Popover>
+                <PopoverTrigger className=" w-full">
+                  <IconButton className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2">
+                    <CloudDownload
+                      className={`size-[18px] pointer-events-none justify-self-end`}
+                    />
+                    <h1
+                      className={`rtl:text-lg-rtl ltr:text-xl-ltr font-semibold justify-self-start`}
+                    >
+                      {t("down_mou")}
+                    </h1>
+                  </IconButton>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 text-primary/95  ltr:text-2xl-ltr rtl:text-md-rtl rtl:font-semibold">
+                  <h1
+                    onClick={() =>
+                      start({
+                        id: generateUUID(),
+                        filename: `${userData.name}.pdf`,
+                        url: `projects/unsigned/mou`,
+                        params: { lang: "en", id: id },
+                      })
+                    }
+                    className="border-b transition-all duration-200 cursor-pointer ease-in-out hover:bg-primary/5 px-3 py-2"
+                  >
+                    {t("english")}
+                  </h1>
+                  <h1
+                    onClick={() =>
+                      start({
+                        id: generateUUID(),
+                        filename: `${userData.name}.pdf`,
+                        url: `projects/unsigned/mou`,
+                        params: { lang: "ps", id: id },
+                      })
+                    }
+                    className="border-b hover:bg-primary/5 px-3 py-2 transition-all duration-200 cursor-pointer ease-in-out"
+                  >
+                    {t("pashto")}
+                  </h1>
+                  <h1
+                    onClick={() =>
+                      start({
+                        id: generateUUID(),
+                        filename: `${userData.name}.pdf`,
+                        url: `projects/unsigned/mou`,
+                        params: { lang: "fa", id: id },
+                      })
+                    }
+                    className="hover:bg-primary/5 px-3 py-2 transition-all duration-200 cursor-pointer ease-in-out"
+                  >
+                    {t("farsi")}
+                  </h1>
+                </PopoverContent>
+              </Popover>
             </>
           )}
         </>
