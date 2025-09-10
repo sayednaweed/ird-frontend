@@ -77,8 +77,6 @@ export default function EditNews() {
       if (response.status == 200) {
         // Check if visibility_date is not null make visibility_duration true
         const news: IEditNews = response.data.news;
-        news.visibility_duration = news.visibility_date == null ? false : true;
-        news.visible = response.data.news.visible === 1 ? true : false;
         news.date = new DateObject(new Date(response.data.news.date));
         if (news.visibility_duration) {
           news.visibility_date = new DateObject(
@@ -166,7 +164,7 @@ export default function EditNews() {
   const hasEdit = per?.edit;
 
   return (
-    <div className="flex flex-col gap-y-6 px-3 mt-2">
+    <div className="flex flex-col gap-y-6 pb-16 px-3 mt-2">
       <Breadcrumb>
         <BreadcrumbHome onClick={handleGoHome} />
         <BreadcrumbSeparator />
@@ -290,7 +288,6 @@ export default function EditNews() {
                     }
                     parentClassName="rounded-md py-[12px] gap-x-1 bg-card border px-[10px]"
                     text={t("visible")}
-                    description={t("visibility_duration_des")}
                     errorMessage={error.get("visible")}
                   />
                   <CustomCheckbox
@@ -346,7 +343,7 @@ export default function EditNews() {
                   userData={userData}
                   errorData={error}
                   placeholder={t("detail")}
-                  rows={3}
+                  rows={7}
                   className="rtl:text-xl-rtl rounded-none border-t border-x-0"
                   tabsClassName="gap-x-5 px-3"
                 >

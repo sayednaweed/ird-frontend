@@ -149,7 +149,7 @@ export default function EditInformationTab(props: EditInformationTabProps) {
           {t("account_information")}
         </CardTitle>
         <CardDescription className="rtl:text-xl-rtl ltr:text-lg-ltr">
-          {t("update_user_acc_info")}
+          {t("edit_descr")}
         </CardDescription>
       </CardHeader>
       <CardContent>

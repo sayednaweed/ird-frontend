@@ -30,10 +30,8 @@ import ProjectsPage from "@/views/pages/auth-features/projects/projects-page";
 import SchedulesPage from "@/views/pages/auth-features/schedules/schedules-page";
 import AddOrEditSchedule from "@/views/pages/auth-features/schedules/add-or-edit-schedule";
 import { ScheduleView } from "@/views/pages/auth-features/schedules/tabs/parts/start-presentation";
-const SuperDashboardPage = lazy(
-  () =>
-    import("@/views/pages/auth-features/dashboard/super/super-dashboard-page")
-);
+import SuperDashboardPage from "@/views/pages/auth-features/dashboard/super/super-dashboard-page";
+
 const UsersProfilePage = lazy(
   () => import("@/views/pages/auth-features/profile/users/users-profile-page")
 );
