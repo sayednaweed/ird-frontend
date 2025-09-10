@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 export const addresses = [
   "home",
-  "news",
-  "organizations",
+  // "news",
+  // "organizations",
   "about_us",
   "contact_us",
   "faqs",

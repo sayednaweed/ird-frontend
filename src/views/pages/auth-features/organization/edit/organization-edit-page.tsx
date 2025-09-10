@@ -268,17 +268,15 @@ export default function OrganizationEditPage() {
                       />
                     </NastranModel>
                     <Popover>
-                      <PopoverTrigger className=" w-full">
-                        <IconButton className="hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2">
-                          <CloudDownload
-                            className={`size-[18px] pointer-events-none justify-self-end`}
-                          />
-                          <h1
-                            className={`rtl:text-lg-rtl ltr:text-xl-ltr font-semibold justify-self-start`}
-                          >
-                            {t("download_r_form")}
-                          </h1>
-                        </IconButton>
+                      <PopoverTrigger className="items-center select-none border rounded-md px-[6px] py-[1px] cursor-pointer hover:bg-primary/5 gap-x-4 mx-auto grid grid-cols-[1fr_4fr] w-[90%] xxl:w-[50%] md:w-[90%] transition-all text-primary rtl:px-3 rtl:py-1 ltr:p-2">
+                        <CloudDownload
+                          className={`size-[18px] pointer-events-none justify-self-end`}
+                        />
+                        <h1
+                          className={`rtl:text-lg-rtl ltr:text-xl-ltr font-semibold justify-self-start`}
+                        >
+                          {t("download_r_form")}
+                        </h1>
                       </PopoverTrigger>
                       <PopoverContent className="p-0 text-primary/95  ltr:text-2xl-ltr rtl:text-md-rtl rtl:font-semibold">
                         <h1
