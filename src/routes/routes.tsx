@@ -73,6 +73,18 @@ const LogsPage = lazy(
   () => import("@/views/pages/auth-features/log/logs-page")
 );
 const NewsPage = lazy(() => import("@/views/pages/main-site/news/news-page"));
+const NewsDetailPage = lazy(
+  () => import("@/views/pages/main-site/news/news-detail-page")
+);
+const DonorsPage = lazy(
+  () => import("@/views/pages/main-site/donors/donors-page")
+);
+const ProjectsPageSite = lazy(
+  () => import("@/views/pages/main-site/projects/projects-page")
+);
+const OrganizationsPageSite = lazy(
+  () => import("@/views/pages/main-site/organizations/organizations-page")
+);
 export const getAuthRouter = (
   user: User | Donor | Organization,
   authenticated: boolean
@@ -405,6 +417,10 @@ const site = (
     <Route index path="/" element={<HomePage />} />
     <Route index path="home" element={<HomePage />} />
     <Route path="news" element={<NewsPage />} />
+    <Route path="news/:id" element={<NewsDetailPage />} />
+    <Route path="donors" element={<DonorsPage />} />
+    <Route path="projects" element={<ProjectsPageSite />} />
+    <Route path="organizations" element={<OrganizationsPageSite />} />
     <Route path="about_us" element={<AboutUsPage />} />
     <Route path="contact_us" element={<ContactUsPage />} />
     <Route path="faqs" element={<FaqsPage />} />

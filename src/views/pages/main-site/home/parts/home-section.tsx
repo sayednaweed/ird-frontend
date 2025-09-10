@@ -10,11 +10,13 @@ export interface HomeSectionProps<T> {
   title: string;
   subTitle: string;
   subTitleLink: string;
+  icon?: React.ReactNode;
   fetch: (
     tab: string,
     url: string
   ) => Promise<{ data: T[]; tab: string; failed: boolean }>;
   children: (data: T) => React.ReactNode;
+  renderAll?: (list: T[]) => React.ReactNode;
   tabLList: {
     name: string;
     url: string;
@@ -39,7 +41,9 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     subTitle,
     title,
     subTitleLink,
+    icon,
     children,
+    renderAll,
     tabLList,
     fetch,
     style,
@@ -54,27 +58,29 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
     }
   }, [i18n.language]);
   const tabStyle = `
-  px-4
-  data-[state=active]:border-b-fourth
-  ltr:text-2xl-ltr font-medium rtl:text-xl-rtl
-  data-[state=active]:shadow-none
-  transition-colors
-  data-[state=active]:text-fourth
-  overflow-hidden whitespace-nowrap
-  text-primary
-  data-[state=active]:bg-transparent
-  border-b-[2px]
-  h-full
-  rounded-none
+  relative inline-flex items-center
+  px-3 py-1.5 rounded-full text-[13px] font-semibold
+  text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white
+  transition-all duration-200
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-orange-400/50
+  data-[state=active]:text-white data-[state=active]:shadow
+  data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-700 data-[state=active]:to-orange-500
+  after:content-[""] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-transparent
+  data-[state=active]:after:bg-orange-500/90 dark:data-[state=active]:after:bg-orange-400/90
+  whitespace-nowrap
 `;
   const onTabClick = async (tab: string, url: string) => {
     const data = await fetch(tab, url);
+    console.debug("HomeSection fetch", { tab, url, failed: data.failed, count: Array.isArray(data.data) ? data.data.length : null });
     setList(data.data);
-    if (data.failed) setFaild(true);
+    setFaild(!!data.failed);
     setTab(tab);
   };
 
-  const tabContentStyle = cn("grid grid-cols-4", style?.tabContent?.className);
+  const tabContentStyle = cn(
+    "grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]",
+    style?.tabContent?.className
+  );
   const tabs = tabLList.map((item) => (
     <TabsTrigger
       onClick={() => onTabClick(item.name, item.url)}
@@ -95,20 +101,63 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
         msOverflowStyle: "none", // IE 10+
       }}
     >
-      {list && list?.map((data: T) => children(data))}
+      {list && list.length === 0 ? (
+        <div className="col-span-full text-sm text-muted-foreground py-6 text-center">
+          No items to display.
+        </div>
+      ) : list &&
+        (renderAll
+          ? renderAll(list)
+          : list.map((data: T, index: number) => (
+              <div key={index}>{children(data)}</div>
+            )))}
     </TabsContent>
   ));
   return (
-    <div className={cn("grid gap-y-2", className)}>
-      <h1 className=" ltr:text-2xl rtl:text-4xl-rtl font-semibold text-primary">
-        {title}
-      </h1>
+    <div className={cn("relative overflow-hidden grid gap-y-3 group", className)}>
+      {/* Decorative section background (scoped) */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        {/* Top-right orb */}
+        <div className="absolute -top-10 right-6 h-40 w-40 rounded-full blur-2xl opacity-25 bg-[radial-gradient(closest-side,_rgba(251,146,60,0.5),_transparent_70%)]" />
+        {/* Bottom-left orb */}
+        <div className="absolute -bottom-12 -left-8 h-56 w-56 rounded-full blur-3xl opacity-20 bg-[radial-gradient(closest-side,_rgba(251,191,36,0.45),_transparent_70%)]" />
+        {/* Diagonal ribbon */}
+        <div className="absolute -inset-x-6 top-1/2 -translate-y-1/2 h-16 rotate-[-5deg] opacity-20 bg-gradient-to-r from-orange-200/50 via-orange-100/40 to-transparent dark:from-orange-900/30 dark:via-orange-800/20 dark:to-transparent" />
+      </div>
+      {/* Title row */}
+      <div className="relative w-full flex items-start gap-3 pb-4">
+        {icon && (
+          <div className="relative shrink-0 mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-orange-700 to-orange-500 text-white shadow-md ring-1 ring-orange-500/40">
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(18rem_8rem_at_30%_-40%,rgba(255,255,255,0.18),transparent_60%)] pointer-events-none" />
+            <span className="translate-y-[0.5px]">{icon}</span>
+          </div>
+        )}
+        {/* Animated subtle grid background */}
+        <div className="pointer-events-none absolute -inset-x-2 -top-6 h-16 opacity-60 [mask-image:radial-gradient(circle_at_center,white,transparent_70%)]">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(100,116,139,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,116,139,0.06)_1px,transparent_1px)] bg-[size:14px_14px]" />
+          <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-orange-400/10 to-transparent" />
+        </div>
+        <h1
+          className="relative z-10 ltr:text-[28px] rtl:text-4xl-rtl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-700 via-orange-600 to-orange-500 dark:from-orange-400 dark:via-orange-500 dark:to-orange-600"
+        >
+          {title}
+        </h1>
+        {/* Decorative underline accent */}
+        <div className="pointer-events-none absolute left-0 bottom-0 h-[3px] w-24 rounded-full bg-gradient-to-r from-orange-700 via-orange-600 to-orange-400 opacity-90 group-hover:w-36 transition-all duration-500" />
+        {/* Subtle glow */}
+        <div className="pointer-events-none absolute -inset-x-2 -top-8 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(30rem_10rem_at_10%_0%,theme(colors.orange.400/12),transparent_60%)]" />
+      </div>
+
+      {/* View all link */}
       <Link
         to={subTitleLink}
-        className="justify-self-end ltr:text-xl-ltr rtl:text-xl-rtl flex items-center text-fourth gap-x-2 hover:bg-fourth/5 py-1 px-2 rounded-sm transition-all ease-in-out duration-300"
+        className="group/button justify-self-end ltr:text-[14px] rtl:text-xl-rtl inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-white bg-gradient-to-r from-orange-700 to-orange-500 hover:from-orange-600 hover:to-orange-400 transition-all duration-300 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 ring-1 ring-orange-500/50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-400/80"
+        aria-label={subTitle}
       >
-        {subTitle}
-        <ArrowRight className="size-[20px] rtl:rotate-180" />
+        <span className="font-semibold tracking-tight">{subTitle}</span>
+        <ArrowRight className="size-[18px] rtl:rotate-180 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+        {/* Shine overlay */}
+        <span className="pointer-events-none absolute -inset-px rounded-full opacity-0 group-hover/button:opacity-100 transition-opacity duration-300 bg-[radial-gradient(20rem_6rem_at_10%_-30%,rgba(255,255,255,0.25),transparent_60%)]" />
       </Link>
 
       <Tabs
@@ -122,11 +171,15 @@ export default function HomeSection<T>(props: HomeSectionProps<T>) {
             msOverflowStyle: "none", // IE 10+
           }}
           className={cn(
-            "border-t gap-x-1 border-primary-foreground/15 overflow-x-auto select-none justify-start p-0 m-0 mb-2 bg-transparent rounded-none",
+            "relative gap-x-1 overflow-x-auto select-none justify-start p-1 m-0 mt-1 mb-3 bg-slate-100 dark:bg-slate-900/40 rounded-full ring-1 ring-slate-200/70 dark:ring-slate-800",
             style?.tabList?.className
           )}
         >
+          {/* Left fade shadow */}
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white dark:from-slate-900 via-white/40 dark:via-slate-900/40 to-transparent rounded-l-full" />
           {tabs}
+          {/* Right fade shadow */}
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white dark:from-slate-900 via-white/40 dark:via-slate-900/40 to-transparent rounded-r-full" />
         </TabsList>
         {!failed && list ? (
           tabContents

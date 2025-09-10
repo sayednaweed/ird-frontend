@@ -28,18 +28,24 @@ export default function AppProvider({
     loadUser();
   }, []);
   useEffect(() => {
-    if (!loading && token && !socket.connected) {
+    const notifUrl = (import.meta as any).env?.VITE_NOTIFICATION_API as string | undefined;
+    if (!loading && token && notifUrl) {
       if (!socket.connected) {
         socket.auth = { token: token };
-        socket.connect();
+        // Attach listeners before connect to catch early errors
         socket.on("connect", onConnect);
         socket.on("disconnect", onDisconnect);
+        socket.on("connect_error", (err) => {
+          console.warn("Socket connect_error:", err?.message ?? err);
+        });
+        socket.connect();
       }
     }
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
-      socket.disconnect();
+      socket.off("connect_error");
+      if (socket.connected) socket.disconnect();
     };
   }, [token, loading]);
   if (loading)

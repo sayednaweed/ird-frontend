@@ -58,6 +58,20 @@ const CachedImage = React.forwardRef<HTMLImageElement, ImageProps>(
     const [failed, setFailed] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const start = useDownloadStore((s) => s.startDownload);
+    const normalizePublicPath = (p: string): string => {
+      try {
+        if (!p) return p;
+        // remove any leading slashes
+        let q = p.replace(/^\/+/, "");
+        // If path is like 'news<uuid>.jpg', fix to 'news/<uuid>.jpg'
+        if (!q.includes("/") && q.startsWith("news") && !q.startsWith("news/")) {
+          q = `news/${q.slice(4)}`;
+        }
+        return q;
+      } catch {
+        return p;
+      }
+    };
     const download = async () => {
       try {
         if (src == null || src == undefined) {
@@ -72,31 +86,70 @@ const CachedImage = React.forwardRef<HTMLImageElement, ImageProps>(
         }
         const cache = ImageCache.getInstance();
 
+        // For public assets, avoid XHR/axios to bypass CORS and let the browser load the image directly
+        if (routeIdentifier === "public" && typeof src === "string") {
+          const base = (import.meta as any).env?.VITE_API_BASE_URL?.replace(/\/+$/, "");
+          if (base) {
+            const directUrl = `${base}/${normalizePublicPath(src)}`;
+            setImage(directUrl);
+            cache.cacheImage(src, directUrl);
+            setLoading(false);
+            return;
+          }
+        }
+
         // Check if image is already cached
         const cachedImage = cache.getImage(src);
         if (cachedImage) {
           setImage(cachedImage);
         } else {
-          // Image not cached, fetch and cache
-          const response = routeIdentifier
-            ? await axiosClient.get(`media/${routeIdentifier}`, {
-                params: {
-                  path: src,
-                },
-                responseType: "blob", // Important
-              })
-            : await axios.get(src, {
-                responseType: "blob",
-              });
-          if (response.status == 200) {
-            // Create a temporary URL for the downloaded image
-            const imageUrl = URL.createObjectURL(new Blob([response.data]));
-            if (response.data.type == "application/json") {
-              setFailed(true);
-              return;
+          // No direct public XHR fallback to avoid CORS; we rely on the early direct URL path for public
+          const tryDirectPublic = async () => false;
+
+          // Image not cached, fetch and cache via API media route or direct fallback
+          try {
+            const response = routeIdentifier
+              ? await axiosClient.get(`media/${routeIdentifier}`, {
+                  params: {
+                    path:
+                      routeIdentifier === "public" && typeof src === "string"
+                        ? normalizePublicPath(src)
+                        : src,
+                  },
+                  responseType: "blob", // Important
+                  // For public media, do not send cookies to avoid strict CORS
+                  withCredentials: routeIdentifier === "public" ? false : axiosClient.defaults.withCredentials,
+                })
+              : await axios.get(src, {
+                  responseType: "blob",
+                });
+
+            if (response.status == 200) {
+              const contentType = (response as any).headers?.["content-type"] || response.data?.type;
+              // If backend returned JSON (e.g., 404 wrapper), fallback to direct for public
+              if (
+                (typeof contentType === "string" && contentType.includes("application/json")) ||
+                response.data?.type === "application/json"
+              ) {
+                const ok = await tryDirectPublic();
+                if (!ok) {
+                  setFailed(true);
+                }
+              } else {
+                // Create a temporary URL for the downloaded image
+                const imageUrl = URL.createObjectURL(new Blob([response.data]));
+                setImage(imageUrl);
+                cache.cacheImage(src, imageUrl);
+              }
             }
-            setImage(imageUrl);
-            cache.cacheImage(src, imageUrl);
+          } catch (err: any) {
+            // If media route fails (e.g., 404), try direct for public assets
+            if (routeIdentifier === "public") {
+              // Already attempted direct URL path above; mark as failed
+              setFailed(true);
+            } else {
+              setFailed(true);
+            }
           }
         }
       } catch (error: any) {
@@ -153,7 +206,10 @@ const CachedImage = React.forwardRef<HTMLImageElement, ImageProps>(
             filename: src
               ? src.substring(src.lastIndexOf("/") + 1)
               : "profile.jpeg",
-            url: `media/profile?path=${src}`,
+            url:
+              routeIdentifier === "public" && typeof src === "string"
+                ? `${(import.meta as any).env?.VITE_API_BASE_URL?.replace(/\/+$/, "")}/${normalizePublicPath(src)}`
+                : `media/${routeIdentifier ?? "profile"}?path=${src}`,
           })
         }
         ref={ref}
