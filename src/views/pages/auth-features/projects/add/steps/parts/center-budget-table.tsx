@@ -39,8 +39,9 @@ export default function CenterBudgetTable(props: CenterBudgetTableProps) {
         return true;
       } else {
         let totalProvince = 0;
-        for (const center of centers) {
-          totalProvince += Number(center?.budget);
+        for (const cen of centers) {
+          // Temprory
+          totalProvince += Number(cen?.budget) ? Number(cen?.budget) : 0;
         }
         totalProvince += Number(center?.budget);
         if (budgetFailed(userData?.budget, totalProvince, t)) return true;
